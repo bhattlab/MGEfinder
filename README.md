@@ -1,10 +1,10 @@
 # *MGEfinder* - A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates.
 
 The command-line tool *MGEfinder* identifies large insertions and genotypes them with respect to a reference genome.
-
+s
 It is designed to work with haploid genomes, and has been tested extensively on bacteria.
 
-It can identify mobile genetic elements and their sites of insertion using a *de novo* approach.
+It can identify mobile genetic elements and their sites of insertion using an *ab initio* approach.
 
 Follow the links below to learn more.
 
