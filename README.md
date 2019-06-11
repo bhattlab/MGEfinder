@@ -1,6 +1,6 @@
-# *mustache* - Tool box to identify mobile element insertions from short-read sequencing data
+# *MGEfinder* - A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates.
 
-The command-line tool *mustache* identifies large insertions and genotypes from short-read sequencing data.
+The command-line tool *MGEfinder* identifies large insertions and genotypes them with respect to a reference genome.
 
 It is designed to work with haploid genomes, and has been tested extensively on bacteria.
 
