@@ -1,0 +1,2 @@
+include mustache/workflow/Snakefile
+include mustache/workflow/config.yml
