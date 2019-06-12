@@ -27,7 +27,7 @@ requirements:
     - scipy
     - networkx
     - tqdm
-    - snakemake
+    - snakemake-minimal
   run:
     - biopython
     - click
@@ -38,13 +38,14 @@ requirements:
     - scipy
     - networkx
     - tqdm
-    - snakemake
+    - snakemake-minimal
     - samtools
     - htslib
     - emboss
     - bowtie2
     - bwa
     - cd-hit
+    - openssl 1.0
 
 test:
   imports:

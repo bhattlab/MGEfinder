@@ -113,7 +113,7 @@ rule inferseq_assembly:
     log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_assembly.log")
     benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_assembly.benchmark.txt")
     input:
-        pair=protected(join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv')),
+        pair=join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv'),
         bam=join(BAM_DIR, "{sample}.{genome}.bam"),
         recover_reference=join(GENOME_DIR, "{genome}.fna"),
         recover_assembly=join(ASSEMBLY_DIR, "{sample}.fna"),
@@ -137,7 +137,7 @@ rule inferseq_reference:
     log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_reference.log")
     benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_reference.benchmark.txt")
     input:
-        pair=protected(join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv')),
+        pair=join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv'),
         recover_reference=join(GENOME_DIR, "{genome}.fna"),
         one_ref=join(GENOME_DIR, '{genome}.fna.1.bt2')
     output:
