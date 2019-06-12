@@ -1,7 +1,7 @@
 import sys
 from Bio import SeqIO
 from snakemake import shell
-from mustache import misc
+from mgefinder import misc
 
 def cluster_100p(infile, outfile):
 

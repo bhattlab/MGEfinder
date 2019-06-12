@@ -6,7 +6,7 @@ from snakemake import shell
 import pygogo as gogo
 from os.path import isfile
 import pysam
-from mustache import misc
+from mgefinder import misc
 
 verbose=False
 logger = gogo.Gogo(__name__, verbose=verbose).logger

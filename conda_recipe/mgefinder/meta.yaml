@@ -1,5 +1,5 @@
 {% set name = "mgefinder" %}
-{% set version = "0.0.1.dev5" %}
+{% set version = "0.0.1.dev6" %}
 
 package:
   name: "{{ name|lower }}"
@@ -7,20 +7,19 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: "93dbcfd4777e2200cd73a71f8746adee2c7b5d9ff1eb4fb05cd413b406f0046f"
+  sha256: "931dec87abaca6a622a97c3b6e598d095530d1d2845b90f967d53f0b35f523a7"
 
 build:
   number: 0
   entry_points:
     - mgefinder = mgefinder.main:cli
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv; pip install jellyfish"
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv; {{ PYTHON }} -m pip install pygogo"
 
 requirements:
   host:
     - biopython
     - click
-    - cython
-    - jellyfish
+    - editdistance
     - pandas
     - pip
     - pysam
@@ -32,8 +31,7 @@ requirements:
   run:
     - biopython
     - click
-    - cython
-    - jellyfish
+    - editdistance
     - pandas
     - pysam
     - python
@@ -44,8 +42,8 @@ requirements:
     - samtools
     - emboss
     - bowtie2
+    - bwa
     - cd-hit
-
 
 test:
   imports:

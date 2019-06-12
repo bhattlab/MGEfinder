@@ -1,2 +1,2 @@
-include mustache/workflow/Snakefile
-include mustache/workflow/config.yml
+include mgefinder/workflow/Snakefile
+include mgefinder/workflow/config.yml

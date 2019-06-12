@@ -20,4 +20,4 @@ Durrant, Matthew, Michelle M. Li, Benjamin Siranosian, and Ami S. Bhatt. 2019. [
 Antibiotic Resistance across Pathogens.](https://doi.org/10.1101/527788) *bioRxiv*.
 
 ## Questions / Comments
-Please submit any questions or comments to our [issues handler](https://github.com/durrantmm/mustache/issues). 
+Please submit any questions or comments to our [issues handler](https://github.com/durrantmm/mgefinder/issues). 
