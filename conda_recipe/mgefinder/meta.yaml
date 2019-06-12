@@ -40,6 +40,7 @@ requirements:
     - tqdm
     - snakemake
     - samtools
+    - htslib
     - emboss
     - bowtie2
     - bwa
