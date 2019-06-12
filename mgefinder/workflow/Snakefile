@@ -7,7 +7,7 @@ WD = config['wd']
 GENOME_DIR= join(WD, config['genome_dir'])
 ASSEMBLY_DIR = join(WD, config['assembly_dir'])
 BAM_DIR = join(WD, config['bam_dir'])
-MUSTACHE_DIR = join(WD, config['mustache_dir'])
+MUSTACHE_DIR = join(WD, config['mgefinder_dir'])
 DATABASE_DIR = join(WD, config['database_dir'])
 RESULTS_DIR = join(WD, config['results_dir'])
 
@@ -61,51 +61,51 @@ rule index_assembly:
         """
 
 
-rule findflanks:
-    log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.findflanks.log")
-    benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.findflanks.benchmark.txt")
+rule find:
+    log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.find.log")
+    benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.find.benchmark.txt")
     input:
         bam=join(BAM_DIR, "{sample}.{genome}.bam"),
     output:
-        findflanks=join(MUSTACHE_DIR, '{genome}/{sample}/01.findflanks.{sample}.{genome}.tsv')
+        find=join(MUSTACHE_DIR, '{genome}/{sample}/01.find.{sample}.{genome}.tsv')
     params:
         sample='{sample}',
-        minlen=config['findflanks']['minlen'],
-        mincount=config['findflanks']['mincount'],
-        minq=config['findflanks']['minq'],
-        minial=config['findflanks']['minial'],
-        mindist=config['findflanks']['mindist'],
-        minratio=config['findflanks']['minratio'],
-        maxir=config['findflanks']['maxir'],
-        lins=config['findflanks']['lins'],
-        mcc=config['findflanks']['mcc']
+        minlen=config['find']['minlen'],
+        mincount=config['find']['mincount'],
+        minq=config['find']['minq'],
+        minial=config['find']['minial'],
+        mindist=config['find']['mindist'],
+        minratio=config['find']['minratio'],
+        maxir=config['find']['maxir'],
+        lins=config['find']['lins'],
+        mcc=config['find']['mcc']
     shell:
         """
-        mustache findflanks -id {params.sample} -minlen {params.minlen} -mincount {params.mincount} -minq {params.minq} \
+        mgefinder find -id {params.sample} -minlen {params.minlen} -mincount {params.mincount} -minq {params.minq} \
         -minial {params.minial} -mindist {params.mindist} -minratio {params.minratio} -maxir {params.maxir} -lins \
-        {params.lins} -mcc {params.mcc} {input.bam} -o {output.findflanks} &> {log}
+        {params.lins} -mcc {params.mcc} {input.bam} -o {output.find} &> {log}
         """
 
 
-rule pairflanks:
-    log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.pairflanks.log")
-    benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.pairflanks.benchmark.txt")
+rule pair:
+    log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.pair.log")
+    benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.pair.benchmark.txt")
     input:
-        findflanks=ancient(join(MUSTACHE_DIR, '{genome}/{sample}/01.findflanks.{sample}.{genome}.tsv')),
+        find=ancient(join(MUSTACHE_DIR, '{genome}/{sample}/01.find.{sample}.{genome}.tsv')),
         bam=join(BAM_DIR, "{sample}.{genome}.bam"),
         genome=join(GENOME_DIR, "{genome}.fna")
     output:
-        pairflanks=join(MUSTACHE_DIR, '{genome}/{sample}/02.pairflanks.{sample}.{genome}.tsv')
+        pair=join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv')
     params:
-        maxdr=config['pairflanks']['maxdr'],
-        minq=config['pairflanks']['minq'],
-        minial=config['pairflanks']['minial'],
-        maxjsp=config['pairflanks']['maxjsp'],
-        lins=config['pairflanks']['lins']
+        maxdr=config['pair']['maxdr'],
+        minq=config['pair']['minq'],
+        minial=config['pair']['minial'],
+        maxjsp=config['pair']['maxjsp'],
+        lins=config['pair']['lins']
     shell:
         """
-        mustache pairflanks -maxdr {params.maxdr} -minq {params.minq} -minial {params.minial} -maxjsp {params.maxjsp} \
-        -lins {params.lins} {input.findflanks} {input.bam} {input.genome} -o {output.pairflanks} &> {log}
+        mgefinder pair -maxdr {params.maxdr} -minq {params.minq} -minial {params.minial} -maxjsp {params.maxjsp} \
+        -lins {params.lins} {input.find} {input.bam} {input.genome} -o {output.pair} &> {log}
         """
 
 
@@ -113,7 +113,7 @@ rule inferseq_assembly:
     log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_assembly.log")
     benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_assembly.benchmark.txt")
     input:
-        pairflanks=protected(join(MUSTACHE_DIR, '{genome}/{sample}/02.pairflanks.{sample}.{genome}.tsv')),
+        pair=protected(join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv')),
         bam=join(BAM_DIR, "{sample}.{genome}.bam"),
         recover_reference=join(GENOME_DIR, "{genome}.fna"),
         recover_assembly=join(ASSEMBLY_DIR, "{sample}.fna"),
@@ -128,8 +128,8 @@ rule inferseq_assembly:
         minsize=config['inferseq_assembly']['minsize']
     shell:
         """
-        mustache inferseq-assembly -minident {params.minident} -maxclip {params.maxclip} -maxsize {params.maxsize} \
-        -minsize {params.minsize} {input.pairflanks} {input.bam} {input.recover_assembly} {input.recover_reference} -o {output.recover} &> {log}
+        mgefinder inferseq-assembly -minident {params.minident} -maxclip {params.maxclip} -maxsize {params.maxsize} \
+        -minsize {params.minsize} {input.pair} {input.bam} {input.recover_assembly} {input.recover_reference} -o {output.recover} &> {log}
         """
 
 
@@ -137,7 +137,7 @@ rule inferseq_reference:
     log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_reference.log")
     benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_reference.benchmark.txt")
     input:
-        pairflanks=protected(join(MUSTACHE_DIR, '{genome}/{sample}/02.pairflanks.{sample}.{genome}.tsv')),
+        pair=protected(join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv')),
         recover_reference=join(GENOME_DIR, "{genome}.fna"),
         one_ref=join(GENOME_DIR, '{genome}.fna.1.bt2')
     output:
@@ -149,8 +149,8 @@ rule inferseq_reference:
         minsize=config['inferseq_reference']['minsize']
     shell:
         """
-        mustache inferseq-reference -minident {params.minident} -maxclip {params.maxclip} -maxsize {params.maxsize} \
-        -minsize {params.minsize} {input.pairflanks} {input.recover_reference} -o {output.recover} &> {log}
+        mgefinder inferseq-reference -minident {params.minident} -maxclip {params.maxclip} -maxsize {params.maxsize} \
+        -minsize {params.minsize} {input.pair} {input.recover_reference} -o {output.recover} &> {log}
         """
 
 
@@ -158,7 +158,7 @@ rule inferseq_overlap:
     log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_overlap.log")
     benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.benchmark.txt")
     input:
-        pairflanks=join(MUSTACHE_DIR, '{genome}/{sample}/02.pairflanks.{sample}.{genome}.tsv'),
+        pair=join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv'),
     output:
         outfile=join(MUSTACHE_DIR, '{genome}/{sample}/03.inferseq_overlap.{sample}.{genome}.tsv')
     params:
@@ -167,8 +167,8 @@ rule inferseq_overlap:
         minsize=config['inferseq_overlap']['minsize']
     shell:
         """
-        mustache inferseq-overlap -minscore {params.minscore} -minopi {params.minopi} -minsize {params.minsize} \
-        {input.pairflanks} -o {output.outfile} &> {log}
+        mgefinder inferseq-overlap -minscore {params.minscore} -minopi {params.minopi} -minsize {params.minsize} \
+        {input.pair} -o {output.outfile} &> {log}
         """
 
 rule make_inferseq_file_path_list:
@@ -200,7 +200,7 @@ rule make_database:
         maxsize=config['makedatabase']['maxsize'],
     shell:
         """
-        mustache makedatabase -minsize {params.minsize} -maxsize {params.maxsize} --threads {threads} \
+        mgefinder makedatabase -minsize {params.minsize} -maxsize {params.maxsize} --threads {threads} \
         --memory {params.memory} -o {params.outdir} -p {params.prefix} {input}  --force
         """
 
@@ -209,7 +209,7 @@ rule inferseq_database:
     log: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_database.log")
     benchmark: join(MUSTACHE_DIR, "{genome}/{sample}/log/{sample}.{genome}.inferseq_database.benchmark.txt")
     input:
-        pairflanks=join(MUSTACHE_DIR, '{genome}/{sample}/02.pairflanks.{sample}.{genome}.tsv'),
+        pair=join(MUSTACHE_DIR, '{genome}/{sample}/02.pair.{sample}.{genome}.tsv'),
         database=join(DATABASE_DIR, '{genome}/{genome}.database.fna'),
         one=join(DATABASE_DIR, '{genome}/{genome}.database.fna.1.bt2')
     output:
@@ -220,8 +220,8 @@ rule inferseq_database:
         maxedgedist=config['inferseq_database']['maxedgedist']
     shell:
         """
-        mustache inferseq-database -minident {params.minident} -maxclip {params.maxclip} -maxedgedist \
-        {params.maxedgedist} {input.pairflanks} {input.database} -o {output.outfile} &> {log}
+        mgefinder inferseq-database -minident {params.minident} -maxclip {params.maxclip} -maxedgedist \
+        {params.maxedgedist} {input.pair} {input.database} -o {output.outfile} &> {log}
         """
 
 rule make_inferseq_database_file_path_list:
@@ -251,15 +251,15 @@ rule clusterseq:
         maxsize=config['clusterseq']['maxsize'],
     shell:
         """
-        mustache clusterseq -minsize {params.minsize} -maxsize {params.maxsize} --threads {threads} \
+        mgefinder clusterseq -minsize {params.minsize} -maxsize {params.maxsize} --threads {threads} \
         --memory {params.memory} {input} -o {output}
         """
 
-rule make_pairflanks_file_path_list:
+rule make_pair_file_path_list:
     input:
-        expand(join(MUSTACHE_DIR, '{{genome}}/{sample}/02.pairflanks.{sample}.{{genome}}.tsv'), sample=SAMPLES)
+        expand(join(MUSTACHE_DIR, '{{genome}}/{sample}/02.pair.{sample}.{{genome}}.tsv'), sample=SAMPLES)
     output:
-        outfile=join(MUSTACHE_DIR, '{genome}/{genome}.all_pairflanks.txt')
+        outfile=join(MUSTACHE_DIR, '{genome}/{genome}.all_pair.txt')
     run:
         with open(output.outfile, 'w') as outfile:
             for f in input:
@@ -271,7 +271,7 @@ rule genotype:
     benchmark: join(RESULTS_DIR, "{genome}/log/{genome}.genotype.benchmark.txt")
     input:
         join(RESULTS_DIR, '{genome}/01.clusterseq.{genome}.tsv'),
-        outfile=join(MUSTACHE_DIR, '{genome}/{genome}.all_pairflanks.txt')
+        outfile=join(MUSTACHE_DIR, '{genome}/{genome}.all_pair.txt')
     output:
         genotype=join(RESULTS_DIR, '{genome}/02.genotype.{genome}.tsv')
     params:
@@ -279,9 +279,9 @@ rule genotype:
     shell:
         """
         if [ "{params.filter_clusters}" == "True" ]; then
-            mustache genotype --filter-clusters-inferred-assembly {input} -o {output} &> {log}
+            mgefinder genotype --filter-clusters-inferred-assembly {input} -o {output} &> {log}
         else
-            mustache genotype --no-filter-clusters-inferred-assembly {input} -o {output} &> {log}
+            mgefinder genotype --no-filter-clusters-inferred-assembly {input} -o {output} &> {log}
         fi
         """
 
@@ -298,7 +298,7 @@ rule summarize:
         prefix=join(RESULTS_DIR, '{genome}/03.summarize.{genome}')
     shell:
         """
-        mustache summarize {input} -o {params.prefix} &> {log}
+        mgefinder summarize {input} -o {params.prefix} &> {log}
         """
 
 
@@ -315,5 +315,5 @@ rule makefasta:
         prefix=join(RESULTS_DIR, '{genome}/04.makefasta.{genome}')
     shell:
         """
-        mustache makefasta {input} -o {params.prefix} &> {log}
+        mgefinder makefasta {input} -o {params.prefix} &> {log}
         """

@@ -168,7 +168,7 @@ def handle_empty_pairsfile(pairs, output_file):
         outfile = pd.DataFrame(columns=['pair_id', 'method', 'loc', 'inferred_seq_length', 'inferred_seq'])
 
         if not output_file:
-            output_file = 'mustache.inferseq_overlap.tsv'
+            output_file = 'mgefinder.inferseq_overlap.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
         logger.info("Empty pairs file, exiting...")

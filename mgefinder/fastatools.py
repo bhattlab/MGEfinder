@@ -5,7 +5,7 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
-from mustache.misc import revcomp
+from mgefinder.misc import revcomp
 
 
 def write_sequences_to_fasta(sequences, fasta, names=None):

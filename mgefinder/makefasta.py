@@ -2,8 +2,8 @@ import sys
 import pandas as pd
 import pygogo as gogo
 from collections import defaultdict
-from mustache import fastatools
-from mustache import misc
+from mgefinder import fastatools
+from mgefinder import misc
 
 verbose=True
 logger = gogo.Gogo(__name__, verbose=verbose).logger

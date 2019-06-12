@@ -3,7 +3,7 @@ import pandas as pd
 from collections import defaultdict
 import pygogo as gogo
 import numpy as np
-from mustache import misc
+from mgefinder import misc
 
 verbose=True
 logger = gogo.Gogo(__name__, verbose=verbose).logger

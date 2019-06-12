@@ -2,7 +2,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import sys
 import click
-from mustache import bwatools, samtools
+from mgefinder import bwatools, samtools
 from os.path import dirname, basename, join, isfile
 import pysam
 from snakemake import shell
@@ -16,7 +16,7 @@ def read_sam_pairs(samfile):
     while True:
         yield(next(samfile), next(samfile))
 
-def format_for_mustache(in_sam, out_bam, read_format='rb', delete_in_sam=False):
+def format_for_mgefinder(in_sam, out_bam, read_format='rb', delete_in_sam=False):
 
     samfile = pysam.AlignmentFile(in_sam, read_format)
     outbam= pysam.AlignmentFile(out_bam, "wb", template=samfile)
@@ -69,9 +69,9 @@ def _formatbam(in_sam, out_bam, single_end, keep_tmp_files):
     logger.info("Successfully removed secondary alignments...\n")
 
     if not single_end:
-        logger.info("Formatting bam file for use by mustache...")
+        logger.info("Formatting bam file for use by mgefinder...")
         tmp_formatted_bam = join(dirname(out_bam), '.'.join(basename(out_bam).split('.')[:-1]) + '.formatted.bam.tmp')
-        reformatted = format_for_mustache(tmp_cleaned_bam, tmp_formatted_bam, delete_in_sam=not keep_tmp_files)
+        reformatted = format_for_mgefinder(tmp_cleaned_bam, tmp_formatted_bam, delete_in_sam=not keep_tmp_files)
         if not reformatted:
             logger.error("Fatal error: SAM file reformatting failed.")
             sys.exit()

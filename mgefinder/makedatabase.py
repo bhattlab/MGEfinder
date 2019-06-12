@@ -3,7 +3,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import pygogo as gogo
 import pandas as pd
-from mustache import fastatools, cdhittools
+from mgefinder import fastatools, cdhittools
 from Bio import SeqIO
 from snakemake import shell
 from collections import defaultdict
@@ -11,7 +11,7 @@ import click
 from os.path import join, isfile
 from os import makedirs, rename
 from shutil import rmtree
-from mustache.bowtie2tools import index_genome
+from mgefinder.bowtie2tools import index_genome
 
 verbose=True
 logger = gogo.Gogo(__name__, verbose=verbose).logger
@@ -93,9 +93,9 @@ class DatabaseMaker:
         self.threads = threads
         self.memory = memory
 
-        self.seq_fasta_path = output_dir + '/mustache.inferseq.fna'
-        self.cluster_100p_path = output_dir + '/mustache.inferseq.100p.fna'
-        self.cluster_perc_ident_path = output_dir + '/mustache.inferseq.perc_ident.fna'
+        self.seq_fasta_path = output_dir + '/mgefinder.inferseq.fna'
+        self.cluster_100p_path = output_dir + '/mgefinder.inferseq.100p.fna'
+        self.cluster_perc_ident_path = output_dir + '/mgefinder.inferseq.perc_ident.fna'
 
 
     def run_cluster_seqs(self):

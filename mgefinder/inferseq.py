@@ -3,7 +3,7 @@ import pysam
 from collections import defaultdict, OrderedDict
 from os.path import join
 from random import randint
-from mustache import fastatools, bowtie2tools, pysamtools, sctools, misc
+from mgefinder import fastatools, bowtie2tools, pysamtools, sctools, misc
 import pygogo as gogo
 from Bio import SeqIO
 import pandas as pd
@@ -70,14 +70,14 @@ class InferSequence:
         return self.make_dataframe()
 
     def __align_pairs_to_fasta(self):
-        fasta_prefix = join(self.tmp_dir, 'mustache.inferseq.' + str(randint(0, 1e20)))
+        fasta_prefix = join(self.tmp_dir, 'mgefinder.inferseq.' + str(randint(0, 1e20)))
 
         writetermini = self.get_termini()
 
         fastatools.write_termini_to_unpaired_fasta(writetermini, fasta_prefix)
 
         logger.info("Aligning pairs to genome...")
-        pair_bam_path = join(self.tmp_dir, 'mustache.inferseq.' + str(randint(0, 1e20)) + '.bam')
+        pair_bam_path = join(self.tmp_dir, 'mgefinder.inferseq.' + str(randint(0, 1e20)) + '.bam')
         bowtie2tools.align_fasta_to_genome(
             fasta_prefix + '.fasta',
             self.genome_fasta, pair_bam_path, silence=True,

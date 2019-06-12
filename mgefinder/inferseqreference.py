@@ -2,8 +2,8 @@ import sys
 import warnings
 warnings.filterwarnings("ignore")
 import pandas as pd
-from mustache import bowtie2tools
-from mustache.inferseq import InferSequence
+from mgefinder import bowtie2tools
+from mgefinder.inferseq import InferSequence
 import pygogo as gogo
 from os.path import dirname
 
@@ -58,7 +58,7 @@ def handle_empty_pairsfile(pairs, output_file):
         outfile = pd.DataFrame(columns=['pair_id', 'method', 'loc', 'inferred_seq_length', 'inferred_seq'])
 
         if not output_file:
-            output_file = 'mustache.inferseq_reference.tsv'
+            output_file = 'mgefinder.inferseq_reference.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
         logger.info("Empty pairs file, exiting...")

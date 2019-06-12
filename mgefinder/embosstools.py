@@ -2,7 +2,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import sys
 from snakemake import shell
-from mustache.fastatools import read_fasta
+from mgefinder.fastatools import read_fasta
 from pandas import Series
 
 def run_einverted(fasta, gap=12, threshold=15, match=3, mismatch=-4, outfile='einverted.tmp.out', outseq='einverted.tmp.outseq'):

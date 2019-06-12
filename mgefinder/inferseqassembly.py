@@ -3,12 +3,12 @@ import warnings
 warnings.filterwarnings("ignore")
 import click
 import pandas as pd
-from mustache import fastatools
-from mustache import bowtie2tools
-from mustache import sctools
-from mustache import misc
-from mustache import pysamtools
-from mustache.inferseq import InferSequence, AlignedPairs
+from mgefinder import fastatools
+from mgefinder import bowtie2tools
+from mgefinder import sctools
+from mgefinder import misc
+from mgefinder import pysamtools
+from mgefinder.inferseq import InferSequence, AlignedPairs
 import pygogo as gogo
 import pysam
 from Bio import SeqIO
@@ -366,7 +366,7 @@ def handle_empty_pairsfile(pairs, output_file):
         outfile = pd.DataFrame(columns=['pair_id', 'method', 'loc', 'inferred_seq_length', 'inferred_seq'])
 
         if not output_file:
-            output_file = 'mustache.inferseq_assembly.tsv'
+            output_file = 'mgefinder.inferseq_assembly.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
         logger.info("Empty pairs file, exiting...")

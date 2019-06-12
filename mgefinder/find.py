@@ -1,9 +1,9 @@
 import sys
-from mustache import pysamtools, sctools, misc, flanktrie
+from mgefinder import pysamtools, sctools, misc, terminustrie
 import pysam
 from collections import defaultdict
 import pandas as pd
-from jellyfish import levenshtein_distance
+import editdistance
 import itertools
 from scipy.sparse.csgraph import connected_components
 import numpy as np
@@ -1042,7 +1042,7 @@ class SoftclipConsensus:
 
             seq1, seq2 = sequences[i], sequences[j]
             minlength = min([len(seq1), len(seq2)])
-            dist = levenshtein_distance(seq1[:minlength], seq2[:minlength])
+            dist = editdistance.eval(seq1[:minlength], seq2[:minlength])
             similarity = 1 - (dist / minlength)
 
             if similarity >= perc_similarity:

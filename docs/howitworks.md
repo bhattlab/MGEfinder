@@ -1,12 +1,12 @@
 [Back to main page](../README.md)  
 
 # How it works
-The *mustache* workflow is described by the schematic below:
+The *mgefinder* workflow is described by the schematic below:
 ![alt text](img/workflow.png)
 
 All that is required is a reference genome and short-read (less than 300 bp) sequencing data of the organism under study.
 
-The *mustache* software suite provides tools to perform most of the analyses depicted above, including:
+The *mgefinder* software suite provides tools to perform most of the analyses depicted above, including:
 
 * Identifying candidate insertion sites and generates consensus sequence of insertion flanks (see `findflanks` and 
 command)
@@ -34,6 +34,6 @@ such as:
 2. More complicated insertions, such as insertions within insertions, are likely to be missed, especially if they 
 include repetitive elements and cannot be assembled within the expected sequence context.
 
-For more detailed information on how *mustache* works, see the [tutorial](tutorial.md) and the [manual](manual.md).
+For more detailed information on how *mgefinder* works, see the [tutorial](tutorial.md) and the [manual](manual.md).
 
 [NEXT: Install or update software](install.md)

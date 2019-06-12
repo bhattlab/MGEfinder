@@ -1,6 +1,6 @@
 import warnings
 warnings.filterwarnings("ignore")
-from mustache.sctools import *
+from mgefinder.sctools import *
 
 def get_left_softclipped_reads_at_site(bam_file, contig, left_site, get_quals=False, softclip_only=False):
     left_softclipped_reads = []

@@ -3,14 +3,13 @@ wd: NONE
 genome_dir: 00.genome
 bam_dir: 00.bam
 assembly_dir: 00.assembly
-mustache_dir: 01.mustache
+mgefinder_dir: 01.mgefinder
 database_dir: 02.database
 results_dir: 03.results
 
 memory: 16000
 
-
-findflanks:
+find:
   minlen: 8
   mincount: 2
   minq: 20
@@ -21,7 +20,7 @@ findflanks:
   lins: 30
   mcc: 2
 
-pairflanks:
+pair:
   maxdr: 20
   minq: 20
   minial: 21

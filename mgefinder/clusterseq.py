@@ -3,7 +3,7 @@ import warnings
 warnings.filterwarnings("ignore")
 import pygogo as gogo
 import pandas as pd
-from mustache import fastatools, cdhittools
+from mgefinder import fastatools, cdhittools
 from Bio import SeqIO
 from snakemake import shell
 import networkx as nx

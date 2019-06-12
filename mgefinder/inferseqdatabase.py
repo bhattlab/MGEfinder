@@ -2,11 +2,11 @@ import sys
 import warnings
 warnings.filterwarnings("ignore")
 import pandas as pd
-from mustache import fastatools
-from mustache import bowtie2tools
-from mustache import sctools
-from mustache import misc
-from mustache import pysamtools
+from mgefinder import fastatools
+from mgefinder import bowtie2tools
+from mgefinder import sctools
+from mgefinder import misc
+from mgefinder import pysamtools
 import pygogo as gogo
 import pysam
 from Bio import SeqIO
@@ -41,7 +41,7 @@ def _inferseq_database(pairsfile, inferseq_database, min_perc_identity, max_inte
 
     logger.info("Aligning pairs to database...")
     assembly_termini_fasta_prefix = write_termini_to_align_to_database(pairs, tmp_dir)
-    assembly_outbam = join(tmp_dir, 'mustache.inferseq_database.' + str(randint(0, 1e20)) + '.bam')
+    assembly_outbam = join(tmp_dir, 'mgefinder.inferseq_database.' + str(randint(0, 1e20)) + '.bam')
     bowtie2tools.align_fasta_to_genome(
         assembly_termini_fasta_prefix + '.fasta',
         inferseq_database, assembly_outbam, silence=True,
@@ -67,7 +67,7 @@ def _inferseq_database(pairsfile, inferseq_database, min_perc_identity, max_inte
     logger.info("Writing results to file %s..." % output_file)
 
     if not output_file:
-        output_file = 'mustache.inferseq_database.tsv'
+        output_file = 'mgefinder.inferseq_database.tsv'
 
     if pairs.shape[0] > 0:
         sample_id = list(pairs['sample'])[0]
@@ -330,7 +330,7 @@ def index_database(inferseq_database):
 
 
 def write_termini_to_align_to_database(pairs, tmp_dir):
-    fasta_prefix = join(tmp_dir, 'mustache.inferseq_database.' + str(randint(0, 1e20)))
+    fasta_prefix = join(tmp_dir, 'mgefinder.inferseq_database.' + str(randint(0, 1e20)))
 
     writetermini = get_termini(pairs)
 
@@ -355,7 +355,7 @@ def handle_empty_pairsfile(pairs, output_file):
         outfile = pd.DataFrame(columns=['pair_id', 'method', 'loc', 'inferred_seq_length', 'inferred_seq'])
 
         if not output_file:
-            output_file = 'mustache.inferseq_database.tsv'
+            output_file = 'mgefinder.inferseq_database.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
         logger.info("Empty pairs file, exiting...")

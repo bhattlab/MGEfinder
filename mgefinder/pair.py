@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 from snakemake import shell
 from random import randint
-from mustache import fastatools, embosstools, pysamtools, sctools
+from mgefinder import fastatools, embosstools, pysamtools, sctools
 from os.path import basename, join, dirname
 from Bio import SeqIO
 import pysam
@@ -76,7 +76,7 @@ class FlankPairer:
                  min_alignment_quality, min_alignment_inner_length, max_junction_spanning_prop,
                  large_insertion_cutoff,
                  truncated_flank_length=40, ir_distance_from_end=15, insertion_spanning_length=10,
-                 tmp_dir='/tmp', tmp_output_prefix='mustache'):
+                 tmp_dir='/tmp', tmp_output_prefix='mgefinder'):
         self.flanks = flanks
         self.bam = bam
         self.genome = genome

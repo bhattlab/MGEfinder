@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
-from mustache import sctools
-from mustache.find import SoftclipParser, SoftclipSite
+from mgefinder import sctools
+from mgefinder.find import SoftclipParser, SoftclipSite
 import pandas as pd
 import pysam
 import pygogo as gogo
