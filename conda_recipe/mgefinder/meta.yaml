@@ -1,5 +1,5 @@
 {% set name = "mgefinder" %}
-{% set version = "0.0.1.dev6" %}
+{% set version = "0.0.1.dev7" %}
 
 package:
   name: "{{ name|lower }}"
