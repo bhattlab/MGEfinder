@@ -1,4 +1,3 @@
-from os.path import dirname, join
 from snakemake import snakemake
 
 

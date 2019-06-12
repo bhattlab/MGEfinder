@@ -3,13 +3,11 @@ warnings.filterwarnings("ignore")
 import sys
 from glob import glob
 from snakemake import shell
-import pygogo as gogo
+import click
 from os.path import isfile
 import pysam
 from mgefinder import misc
 
-verbose=False
-logger = gogo.Gogo(__name__, verbose=verbose).logger
 
 def index_genome(genome_path, silence=True):
     if silence:

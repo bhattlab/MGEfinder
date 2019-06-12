@@ -8,10 +8,7 @@ import itertools
 from scipy.sparse.csgraph import connected_components
 import numpy as np
 from tqdm import tqdm
-
-import pygogo as gogo
-verbose = True
-logger = gogo.Gogo(__name__, verbose=False).logger
+import click
 
 
 
@@ -22,7 +19,7 @@ def _find(bamfile, min_softclip_length, min_softclip_count, min_alignment_qualit
     bam = pysam.AlignmentFile(bamfile, 'rb')
 
     softclip_parser = SoftclipParser(
-        bam, verbose=True,
+        bam,
         min_softclip_length=min_softclip_length,
         min_softclip_count=min_softclip_count,
         min_alignment_quality=min_alignment_quality,
@@ -53,7 +50,7 @@ def _find(bamfile, min_softclip_length, min_softclip_count, min_alignment_qualit
     final_df.insert(0, 'sample', sample_id)
 
     if output_file:
-        logger.info("Saving results to file %s" % output_file)
+        click.echo("Saving results to file %s" % output_file)
         final_df.to_csv(output_file, sep='\t', index=False)
 
     return final_df
@@ -64,7 +61,6 @@ class SoftclipParser:
     softclipped_sites = None
     bam = None
     contig_lengths = None
-    verbose = None
 
     min_alignment_quality = None
     min_alignment_inner_length = None
@@ -77,11 +73,11 @@ class SoftclipParser:
     min_count_consensus = None
 
 
-    def __init__(self, bam, verbose=True, min_alignment_quality=20, min_alignment_inner_length=21,
+    def __init__(self, bam, min_alignment_quality=20, min_alignment_inner_length=21,
                  min_softclip_length=4, min_softclip_count=4, min_distance_to_mate=22,
                  min_softclip_ratio=0.15, max_indel_ratio=0.03, large_insertion_cutoff=30,
                  min_count_consensus=2):
-        self.verbose = verbose
+
         self.bam = bam
         self.contig_lengths = pysamtools.get_bam_contig_dict(bam)
 
@@ -99,17 +95,15 @@ class SoftclipParser:
 
     def parse_softclips(self):
 
-        if self.verbose:
-            logger.info("Parsing softclipped sites from provided BAM file...")
+        click.echo("Parsing softclipped sites from provided BAM file...")
 
         read_count = 0
         for read in self.bam:
 
             read_count += 1
 
-            if self.verbose and read_count % 100000 == 0:
-                logger.info("\tAfter checking %d reads, %d softclipped sites found..." % (read_count, self.count_softclips()))
-                pass
+            if read_count % 100000 == 0:
+                click.echo("\tAfter checking %d reads, %d softclipped sites found..." % (read_count, self.count_softclips()))
 
             if not self.passes_read_filters(read):
                 continue
@@ -140,9 +134,7 @@ class SoftclipParser:
 
         self.softclipped_sites = filtered_softclipped_sites
 
-        if verbose:
-            logger.info("After filtering by minimum softclip length of %d, %d sites remain" % (self.min_softclip_length, self.count_softclips()))
-            pass
+        click.echo("After filtering by minimum softclip length of %d, %d sites remain" % (self.min_softclip_length, self.count_softclips()))
 
 
     def filter_softclips_mincount(self):
@@ -163,10 +155,9 @@ class SoftclipParser:
 
         self.softclipped_sites = filtered_softclipped_sites
 
-        if verbose:
-            logger.info("After filtering by minimum softclipped read count of %d, %d sites remain" % (
-                self.min_softclip_count, self.count_softclips()))
-            pass
+        click.echo("After filtering by minimum softclipped read count of %d, %d sites remain" % (
+            self.min_softclip_count, self.count_softclips()))
+        pass
 
     def filter_softclips_mindistance(self):
 
@@ -194,10 +185,8 @@ class SoftclipParser:
 
         self.softclipped_sites = filtered_softclipped_sites
 
-        if verbose:
-            logger.info("After filtering by minimum nearest mate distance %d, %d sites remain" % (
-                self.min_distance_to_mate, self.count_softclips()))
-            pass
+        click.echo("After filtering by minimum nearest mate distance %d, %d sites remain" % (
+            self.min_distance_to_mate, self.count_softclips()))
 
 
     def filter_softclips_count_ratios(self):
@@ -232,11 +221,9 @@ class SoftclipParser:
 
         self.softclipped_sites = filtered_softclipped_sites
 
-        if verbose:
-            logger.info("After filtering by minimum softclip ratio of %f and a "
-                        "maximum indel ratio of %f, %d sites remain" % (
-                self.min_softclip_ratio, self.max_indel_ratio, self.count_softclips()))
-            pass
+        click.echo("After filtering by minimum softclip ratio of %f and a "
+                     "maximum indel ratio of %f, %d sites remain" % (
+            self.min_softclip_ratio, self.max_indel_ratio, self.count_softclips()))
 
     def filter_consensus_sequences_minlength(self):
 
@@ -277,10 +264,10 @@ class SoftclipParser:
 
         self.softclipped_sites = filtered_softclipped_sites
 
-        if verbose:
-            logger.info("After filtering consensus sequences by a minimum length of %d, %d terminus sequences remain" % (
-                            self.min_softclip_count, self.count_consensus_seqs())
-                        )
+
+        click.echo("After filtering consensus sequences by a minimum length of %d, %d terminus sequences remain" % (
+                        self.min_softclip_count, self.count_consensus_seqs())
+                    )
 
     def filter_consensus_sequences_mincount(self):
 
@@ -317,9 +304,8 @@ class SoftclipParser:
 
         self.softclipped_sites = filtered_softclipped_sites
 
-        if verbose:
-            logger.info("After filtering consensus sequences by a minimum softclip count of %d, %d terminus sequences remain" % (
-                self.min_softclip_count, self.count_consensus_seqs())
+        click.echo("After filtering consensus sequences by a minimum softclip count of %d, %d terminus sequences remain" % (
+            self.min_softclip_count, self.count_consensus_seqs())
                         )
 
     def filter_multiple_consensus_sequences(self):
@@ -336,10 +322,9 @@ class SoftclipParser:
                     best_consensus = self.get_best_consensus_sequence(softclip_site.consensus_sequences_3p)
                     softclip_site.consensus_sequences_3p = best_consensus
 
-        if verbose:
-            logger.info("After selecting the best consensus sequence at each site, %d terminus sequences remain." % (
-                self.count_consensus_seqs()
-            ))
+        click.echo("After selecting the best consensus sequence at each site, %d terminus sequences remain." % (
+            self.count_consensus_seqs()
+        ))
 
 
     def get_best_consensus_sequence(self, consensus_seqs):
@@ -347,9 +332,7 @@ class SoftclipParser:
 
 
     def parse_unclipped_read_info(self):
-        if verbose:
-            logger.info("Getting unclipped read information near softclipped sites...")
-            pass
+        click.echo("Getting unclipped read information near softclipped sites...")
 
         pbar_contigs = tqdm(self.softclipped_sites, desc='Contigs', leave=False)
 
@@ -511,8 +494,8 @@ class SoftclipParser:
 
     def make_consensus_sequences(self):
 
-        if self.verbose:
-            logger.info('Generating consensus sequences from softclipped termini...')
+        click.echo('Generating consensus sequences from softclipped termini...')
+
         for contig in self.softclipped_sites:
 
             for pos in self.softclipped_sites[contig]:

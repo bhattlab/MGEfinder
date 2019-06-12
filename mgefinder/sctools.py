@@ -1,6 +1,5 @@
 import warnings
 warnings.filterwarnings("ignore")
-import sys
 
 def left_softclip_length(read):
     return read.cigartuples[0][1]

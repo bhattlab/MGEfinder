@@ -1,6 +1,6 @@
 import warnings
 warnings.filterwarnings("ignore")
-import sys
+
 from scipy.stats import poisson
 from bisect import bisect_left, bisect_right
 

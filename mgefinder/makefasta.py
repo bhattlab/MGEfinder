@@ -1,28 +1,26 @@
-import sys
 import pandas as pd
-import pygogo as gogo
+import click
 from collections import defaultdict
 from mgefinder import fastatools
-from mgefinder import misc
 
 verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
+
 
 def _makefasta(clusterseq, summarize_clusters, output_prefix):
 
     fasta_all_path = output_prefix + '.all_seqs.fna'
     fasta_repr_path = output_prefix + '.repr_seqs.fna'
 
-    logger.info('Reading clusterseq...')
+    click.echo('Reading clusterseq...')
     clusterseq = pd.read_table(clusterseq)
 
-    logger.info('Reading summarized clusters...')
+    click.echo('Reading summarized clusters...')
     summarize_clusters = pd.read_table(summarize_clusters)
 
-    logger.info('Creating fasta for all unique sequences...')
+    click.echo('Creating fasta for all unique sequences...')
     make_all_unique_fasta(clusterseq, summarize_clusters, fasta_all_path)
 
-    logger.info('Creating fasta for representative sequences...')
+    click.echo('Creating fasta for representative sequences...')
     make_repr_cluster_fasta(summarize_clusters, fasta_repr_path)
 
 

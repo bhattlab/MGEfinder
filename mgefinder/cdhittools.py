@@ -1,4 +1,3 @@
-import sys
 from Bio import SeqIO
 from snakemake import shell
 from mgefinder import misc

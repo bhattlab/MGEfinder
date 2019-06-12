@@ -1,6 +1,5 @@
 import warnings
 warnings.filterwarnings("ignore")
-import sys
 from snakemake import shell
 from mgefinder.fastatools import read_fasta
 from pandas import Series
@@ -10,7 +9,6 @@ def run_einverted(fasta, gap=12, threshold=15, match=3, mismatch=-4, outfile='ei
               '-mismatch {mismatch} -outfile {outfile} -outseq {outseq} -auto Y -warning N'.format(
         fasta=fasta, gap=gap, threshold=threshold, match=match, mismatch=mismatch, outfile=outfile, outseq=outseq
     )
-    #print(command)
     shell(command)
 
 

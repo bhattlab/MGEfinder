@@ -1,9 +1,6 @@
 import warnings
 warnings.filterwarnings("ignore")
-import sys
-from glob import glob
 from snakemake import shell
-import pygogo as gogo
 from os.path import isfile
 
 def remove_secondary_alignments(in_bam, out_bam, delete_in_bam=False):

@@ -4,14 +4,11 @@ from collections import defaultdict, OrderedDict
 from os.path import join
 from random import randint
 from mgefinder import fastatools, bowtie2tools, pysamtools, sctools, misc
-import pygogo as gogo
+import click
 from Bio import SeqIO
 import pandas as pd
 from snakemake import shell
 
-
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
 
 class InferSequence:
 
@@ -76,7 +73,7 @@ class InferSequence:
 
         fastatools.write_termini_to_unpaired_fasta(writetermini, fasta_prefix)
 
-        logger.info("Aligning pairs to genome...")
+        click.echo("Aligning pairs to genome...")
         pair_bam_path = join(self.tmp_dir, 'mgefinder.inferseq.' + str(randint(0, 1e20)) + '.bam')
         bowtie2tools.align_fasta_to_genome(
             fasta_prefix + '.fasta',

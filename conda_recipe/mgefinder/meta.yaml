@@ -7,13 +7,13 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: "931dec87abaca6a622a97c3b6e598d095530d1d2845b90f967d53f0b35f523a7"
+  sha256: "756cc195a03cfc17a0d550a000ad618957239b11f60de6813705772911ee2847"
 
 build:
   number: 0
   entry_points:
     - mgefinder = mgefinder.main:cli
-  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv; {{ PYTHON }} -m pip install pygogo"
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv"
 
 requirements:
   host:

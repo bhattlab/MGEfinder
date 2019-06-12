@@ -1,7 +1,5 @@
 import warnings
 warnings.filterwarnings("ignore")
-import click
-import sys
 
 from mgefinder.workflow import _workflow
 from mgefinder.find import _find
@@ -19,14 +17,9 @@ from mgefinder.genotype import _genotype
 from mgefinder.summarize import _summarize
 from mgefinder.makefasta import _makefasta
 
-import pygogo as gogo
-from os.path import isfile, join
-from os.path import basename, dirname, abspath
-from os import makedirs
+import click
+from os.path import join, dirname, abspath
 from shutil import copyfile
-
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
 
 WORKFLOW_SNAKEFILE = join(dirname(__file__), 'workflow/Snakefile')
 WORKFLOW_CONFIG = join(dirname(__file__), 'workflow/config.yml')
@@ -57,10 +50,10 @@ def workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomp
 def getworkflow():
     """A click access point for the workflow module. This is used for creating the command line interface."""
 
-    logger.info("Copying Snakefile and config file to current working directory...")
+    click.echo("Copying Snakefile and config file to current working directory...")
     copyfile(WORKFLOW_SNAKEFILE, "Snakefile")
     copyfile(WORKFLOW_CONFIG, "config.yml")
-    logger.info("Done.")
+    click.echo("Done.")
 
 
 
@@ -286,9 +279,9 @@ def recall(pairsfile, bamfile, min_alignment_quality, min_alignment_inner_length
 
 
 def log_params(**kwargs):
-    logger.info("#### PARAMETERS ###")
-    logger.info('\n'.join(list(map(lambda x: ': '.join(list(map(str, x))), kwargs.items()))))
-    logger.info("###################")
+    click.echo("#### PARAMETERS ###")
+    click.echo('\n'.join(list(map(lambda x: ': '.join(list(map(str, x))), kwargs.items()))))
+    click.echo("###################")
 
 if __name__ == '__main__':
 

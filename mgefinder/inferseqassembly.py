@@ -1,30 +1,20 @@
-import sys
 import warnings
 warnings.filterwarnings("ignore")
-import click
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
+import sys
 import pandas as pd
-from mgefinder import fastatools
 from mgefinder import bowtie2tools
 from mgefinder import sctools
 from mgefinder import misc
-from mgefinder import pysamtools
 from mgefinder.inferseq import InferSequence, AlignedPairs
-import pygogo as gogo
+import click
 import pysam
 from Bio import SeqIO
 from collections import OrderedDict
-from os.path import dirname, join
-from random import randint
-from snakemake import shell
+from os.path import dirname
 from collections import defaultdict
-
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
-
-
-import warnings
-warnings.filterwarnings("ignore", message="numpy.dtype size changed")
-warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 
 def _inferseq_assembly(pairsfile, bamfile, inferseq_assembly, inferseq_reference, min_perc_identity,
@@ -59,8 +49,8 @@ def _inferseq_assembly(pairsfile, bamfile, inferseq_assembly, inferseq_reference
         ['pair_id', 'loc']
     )
 
-    logger.info("Inferred sequences for %d pairs..." % len(set(list(inferred_sequences['pair_id']))))
-    logger.info("Writing results to file %s..." % output_file)
+    click.echo("Inferred sequences for %d pairs..." % len(set(list(inferred_sequences['pair_id']))))
+    click.echo("Writing results to file %s..." % output_file)
     if pairs.shape[0] > 0:
         sample_id = list(pairs['sample'])[0]
         inferred_sequences.insert(0, 'sample', sample_id)
@@ -356,9 +346,9 @@ def initialize_sequence_context(target_region, expanded_start, expanded_end):
 
 def index_genome(inferseq_assembly):
     if not bowtie2tools.genome_is_indexed(inferseq_assembly):
-        logger.info("Indexing inferseq assembly...")
+        click.echo("Indexing inferseq assembly...")
         bowtie2tools.index_genome(inferseq_assembly)
-    logger.info("Genome has been indexed...")
+    click.echo("Genome has been indexed...")
 
 
 def handle_empty_pairsfile(pairs, output_file):
@@ -369,5 +359,5 @@ def handle_empty_pairsfile(pairs, output_file):
             output_file = 'mgefinder.inferseq_assembly.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
-        logger.info("Empty pairs file, exiting...")
+        click.echo("Empty pairs file, exiting...")
         sys.exit()

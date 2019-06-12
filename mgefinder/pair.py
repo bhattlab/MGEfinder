@@ -1,7 +1,6 @@
-import sys
 import warnings
 warnings.filterwarnings("ignore")
-import pygogo as gogo
+import click
 import pandas as pd
 import numpy as np
 from snakemake import shell
@@ -11,8 +10,6 @@ from os.path import basename, join, dirname
 from Bio import SeqIO
 import pysam
 from collections import defaultdict
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
 
 
 def _pair(findfile, bamfile, genome, max_direct_repeat_length, min_alignment_quality,
@@ -30,7 +27,7 @@ def _pair(findfile, bamfile, genome, max_direct_repeat_length, min_alignment_qua
                                tmp_dir=dirname(output_file), tmp_output_prefix=tmp_output_prefix)
 
     if flanks.shape[0] == 0:
-        logger.info("No flanks found in the input file...")
+        click.echo("No flanks found in the input file...")
 
         flank_pairs = flank_pairer.get_header_dataframe()
         flank_pairs.insert(0, 'sample', None)
@@ -45,7 +42,7 @@ def _pair(findfile, bamfile, genome, max_direct_repeat_length, min_alignment_qua
         flank_pairs.insert(0, 'sample', sample_id)
 
         if output_file:
-            logger.info("Saving results to file %s" % output_file)
+            click.echo("Saving results to file %s" % output_file)
             flank_pairs.to_csv(output_file, sep='\t', index=False)
 
         return flank_pairs
@@ -94,25 +91,25 @@ class FlankPairer:
 
 
     def run_pair_flanks(self):
-        logger.info("Finding all flank pairs within %d bases of each other ..." % self.max_direct_repeat_length)
+        click.echo("Finding all flank pairs within %d bases of each other ..." % self.max_direct_repeat_length)
         pairs = self.pair_all_nearby_flanks(self.flanks)
-        logger.info("Finding all inverted repeats at termini in %d candidate pairs..." % pairs.shape[0])
+        click.echo("Finding all inverted repeats at termini in %d candidate pairs..." % pairs.shape[0])
         pairs = self.check_pairs_for_ir(pairs)
-        logger.info("Assigning pairs according to existence of inverted repeats, read count difference, and flank length difference...")
+        click.echo("Assigning pairs according to existence of inverted repeats, read count difference, and flank length difference...")
         assigned_pairs = self.assign_pairs(pairs)
-        logger.info("Filtering out pairs with evidence of reads spanning both clipped junctions...")
+        click.echo("Filtering out pairs with evidence of reads spanning both clipped junctions...")
         analyzed_pairs = self.count_insertion_spanning_reads(assigned_pairs)
 
-        logger.info("Identified %d flank pairs in total..." % analyzed_pairs.shape[0])
-        logger.info("Identified %d flank pairs with inverted repeats..." % analyzed_pairs.query('has_IR==True').shape[0])
-        logger.info("Identified %d flank pairs with reads that span the insertion..." % analyzed_pairs.query('spanning_count > 0').shape[0])
+        click.echo("Identified %d flank pairs in total..." % analyzed_pairs.shape[0])
+        click.echo("Identified %d flank pairs with inverted repeats..." % analyzed_pairs.query('has_IR==True').shape[0])
+        click.echo("Identified %d flank pairs with reads that span the insertion..." % analyzed_pairs.query('spanning_count > 0').shape[0])
 
-        logger.info("Filtering sites with junction-spanning reads...")
+        click.echo("Filtering sites with junction-spanning reads...")
         filtered_pairs = self.filter_junction_spanning(analyzed_pairs)
-        logger.info("%d flank pairs remain after filtering..." % filtered_pairs.shape[0])
+        click.echo("%d flank pairs remain after filtering..." % filtered_pairs.shape[0])
 
 
-        logger.info("Getting direct repeats and surrounding genomic region...")
+        click.echo("Getting direct repeats and surrounding genomic region...")
         final_pairs = self.get_direct_repeats(filtered_pairs)
 
 

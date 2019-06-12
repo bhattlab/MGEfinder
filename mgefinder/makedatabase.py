@@ -1,7 +1,6 @@
 import sys
 import warnings
 warnings.filterwarnings("ignore")
-import pygogo as gogo
 import pandas as pd
 from mgefinder import fastatools, cdhittools
 from Bio import SeqIO
@@ -13,18 +12,14 @@ from os import makedirs, rename
 from shutil import rmtree
 from mgefinder.bowtie2tools import index_genome
 
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
-from tqdm import tqdm
-
 
 def _makedatabase(inferseqfiles, minimum_size, maximum_size, threads, memory, force, output_dir, prefix):
 
-    logger.info("Parsing inferseq files")
+    click.echo("Parsing inferseq files")
     if len(inferseqfiles) == 1 and is_path_list(inferseqfiles[0]):
         inferseqfiles = [l.strip() for l in open(inferseqfiles[0], 'r')]
 
-    logger.info("Combining the inferseq files...")
+    click.echo("Combining the inferseq files...")
     inferseq = combine_inferseq_files(inferseqfiles, minimum_size, maximum_size)
 
     database_maker = DatabaseMaker(inferseq, threads, memory, output_dir)
@@ -35,15 +30,15 @@ def _makedatabase(inferseqfiles, minimum_size, maximum_size, threads, memory, fo
     except FileExistsError:
 
         if force:
-            logger.info('Deleting old database directory...')
+            click.echo('Deleting old database directory...')
             rmtree(output_dir)
             makedirs(output_dir)
         else:
-            logger.info('Output directory already exists. Use --force to overwrite directory.')
+            click.echo('Output directory already exists. Use --force to overwrite directory.')
             sys.exit()
 
     if inferseq.shape[0] == 0:
-        logger.info("No termini found in the input file...")
+        click.echo("No termini found in the input file...")
 
         clustered_seqs = database_maker.get_header_dataframe()
 
@@ -53,7 +48,7 @@ def _makedatabase(inferseqfiles, minimum_size, maximum_size, threads, memory, fo
         outfile = join(output_dir, prefix+'.fna')
         rename(cluster_fna, outfile)
         database_maker.remove_int_files()
-        logger.info("Indexing database for use with bowtie2")
+        click.echo("Indexing database for use with bowtie2")
         index_genome(outfile)
 
 def is_path_list(f):
@@ -121,7 +116,7 @@ class DatabaseMaker:
 
     def cluster_100p(self):
 
-        logger.info("Clustering at 100% identity...")
+        click.echo("Clustering at 100% identity...")
 
         cdhittools.cluster_100p(self.seq_fasta_path, self.cluster_100p_path)
 
@@ -217,10 +212,10 @@ class DatabaseMaker:
 
 
 def combine_inferseq_files(inferseq_files, minimum_size, maximum_size):
-    logger.info('Loading file {num1}/{num2}: {f}'.format(num1=1, num2=len(inferseq_files), f=inferseq_files[0]))
+    click.echo('Loading file {num1}/{num2}: {f}'.format(num1=1, num2=len(inferseq_files), f=inferseq_files[0]))
     inferseq = pd.read_csv(inferseq_files[0], sep='\t')
     for i, f in enumerate(inferseq_files[1:]):
-        logger.info('Loading file {num1}/{num2}: {f}'.format(num1=i+2, num2=len(inferseq_files), f=f))
+        click.echo('Loading file {num1}/{num2}: {f}'.format(num1=i+2, num2=len(inferseq_files), f=f))
         inferseq = inferseq.append(pd.read_csv(f, sep='\t').
                                    query('inferred_seq_length >= @minimum_size').
                                    query('inferred_seq_length <= @maximum_size'))

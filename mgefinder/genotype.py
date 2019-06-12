@@ -1,29 +1,22 @@
-import sys
 import warnings
 warnings.filterwarnings("ignore")
-import pygogo as gogo
 import pandas as pd
 from collections import defaultdict
 import click
 from os.path import isfile
 
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
-
-from os.path import basename
-
 
 def _genotype(clusterseq, pairfiles, filter_clusters_inferred_assembly, output_file):
 
 
-    logger.info("Loading clusterseq file...")
+    click.echo("Loading clusterseq file...")
     clusterseq = pd.read_table(clusterseq)[['sample', 'pair_id', 'method', 'seqid', 'cluster', 'group']]
 
-    logger.info("Parsing pair files")
+    click.echo("Parsing pair files")
     if len(pairfiles) == 1 and is_path_list(pairfiles[0]):
         pairfiles = [l.strip() for l in open(pairfiles[0], 'r')]
 
-    logger.info("Loading pair files...")
+    click.echo("Loading pair files...")
     pairs = combine_pair_files(pairfiles)
 
 
@@ -31,7 +24,7 @@ def _genotype(clusterseq, pairfiles, filter_clusters_inferred_assembly, output_f
 
 
     if pairs.shape[0] == 0:
-        logger.info("No termini found in the input file...")
+        click.echo("No termini found in the input file...")
 
         genotypes = genotyper.get_header_dataframe()
 
@@ -44,7 +37,7 @@ def _genotype(clusterseq, pairfiles, filter_clusters_inferred_assembly, output_f
         genotypes = genotyper.genotype()
 
         if output_file:
-            logger.info("Saving results to file %s" % output_file)
+            click.echo("Saving results to file %s" % output_file)
             genotypes.to_csv(output_file, sep='\t', index=False)
 
         return genotypes
@@ -100,7 +93,7 @@ class Genotyper:
     def genotype(self):
 
         if self.filter_clusters_inferred_assembly:
-            logger.info("Filtering out clusters that are never inferred from an assembly...")
+            click.echo("Filtering out clusters that are never inferred from an assembly...")
             self.clusterseq = self.apply_filter_clusters_inferred_assembly(self.clusterseq)
 
         combined = pd.merge(self.pairs, self.clusterseq, how='left', on=['sample', 'pair_id'])
@@ -127,7 +120,7 @@ class Genotyper:
 
         exclude_clusters = set([clust for clust in set(clusterseq.cluster) if clust not in keep_clusters])
 
-        logger.info(
+        click.echo(
             "Excluding %d clusters that were only inferred from the reference genome..." % len(exclude_clusters))
 
         clusterseq = clusterseq[[clust in keep_clusters for clust in clusterseq.cluster]]
@@ -140,14 +133,14 @@ class Genotyper:
         total_no_inference = no_inference[['sample', 'pair_id']].drop_duplicates().shape[0]
         total_has_inference = has_inference[['sample', 'pair_id']].drop_duplicates().shape[0]
 
-        logger.info(
+        click.echo(
             "Out of %d candidate insertions, %d had some inferred identity, while %d had no inferred identity." %
             (total_count, total_has_inference, total_no_inference)
         )
 
     def assign_genotypes_heuristic(self, data):
 
-        logger.info("Assigning initial genotypes...")
+        click.echo("Assigning initial genotypes...")
 
         # IAwFC
         IAwFC = data[data.method == 'inferred_assembly_with_full_context']
@@ -202,7 +195,7 @@ class Genotyper:
 
     def resolve_ambiguous_genotypes(self, data):
 
-        logger.info("Identifying ambiguous genotypes...")
+        click.echo("Identifying ambiguous genotypes...")
 
         counts = data.groupby(['sample', 'pair_id']).size().rename('n').reset_index()
 
@@ -217,7 +210,7 @@ class Genotyper:
         if ambiguous.shape[0] == 0:
             return not_ambiguous
 
-        logger.info("Resolving ambiguous genotypes where possible...")
+        click.echo("Resolving ambiguous genotypes where possible...")
 
         mobile_clusters = self.calculate_mobile_clusters(data)
         cluster_counts_per_site = self.count_clusters_per_site(data)

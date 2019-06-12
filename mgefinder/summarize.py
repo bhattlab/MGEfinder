@@ -1,22 +1,19 @@
-import sys
 import pandas as pd
 from collections import defaultdict
-import pygogo as gogo
+import click
 import numpy as np
 from mgefinder import misc
 
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
 
 def _summarize(clusterseq, genotypes, output_prefix):
 
     summary_clusters_path = output_prefix + '.clusters.tsv'
     summary_groups_path = output_prefix + '.groups.tsv'
 
-    logger.info('Reading clusterseq...')
+    click.echo('Reading clusterseq...')
     clusterseq = pd.read_table(clusterseq)
 
-    logger.info('Reading genotypes...')
+    click.echo('Reading genotypes...')
     genotypes = pd.read_table(genotypes)
 
 
@@ -25,13 +22,13 @@ def _summarize(clusterseq, genotypes, output_prefix):
     genotypes = genotypes[-genotypes.cluster.str.startswith('UClust')]
 
 
-    logger.info("Summarizing clusters...")
+    click.echo("Summarizing clusters...")
     cluster_summary = summarize_clusters(clusterseq, genotypes)
 
-    logger.info("Summarizing groups...")
+    click.echo("Summarizing groups...")
     group_summary = summarize_groups(clusterseq, genotypes)
 
-    logger.info("Writing results to files %s and %s" % (summary_clusters_path, summary_groups_path))
+    click.echo("Writing results to files %s and %s" % (summary_clusters_path, summary_groups_path))
     cluster_summary.to_csv(summary_clusters_path, sep='\t', index=False)
     group_summary.to_csv(summary_groups_path, sep='\t', index=False)
 

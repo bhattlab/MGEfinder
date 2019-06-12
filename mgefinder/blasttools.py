@@ -1,4 +1,3 @@
-import sys
 from glob import glob
 from snakemake import shell
 from os.path import isfile

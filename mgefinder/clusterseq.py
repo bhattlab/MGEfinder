@@ -1,7 +1,5 @@
-import sys
 import warnings
 warnings.filterwarnings("ignore")
-import pygogo as gogo
 import pandas as pd
 from mgefinder import fastatools, cdhittools
 from Bio import SeqIO
@@ -11,25 +9,20 @@ from collections import defaultdict
 import click
 from os.path import isfile
 
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
-from tqdm import tqdm
-from os.path import basename
-
 
 def _clusterseq(inferseqfiles, minimum_size, maximum_size, threads, memory, output_file):
 
-    logger.info("Parsing inferseq files")
+    click.echo("Parsing inferseq files")
     if len(inferseqfiles) == 1 and is_path_list(inferseqfiles[0]):
         inferseqfiles = [l.strip() for l in open(inferseqfiles[0], 'r')]
 
-    logger.info("Combining the inferseq files...")
+    click.echo("Combining the inferseq files...")
     inferseq = combine_inferseq_files(inferseqfiles, minimum_size, maximum_size)
 
     seq_cluster = SequenceClusterer(inferseq, threads, memory, output_file)
 
     if inferseq.shape[0] == 0:
-        logger.info("No flanks found in the input file...")
+        click.echo("No flanks found in the input file...")
 
         clustered_seqs = seq_cluster.get_header_dataframe()
 
@@ -44,7 +37,7 @@ def _clusterseq(inferseqfiles, minimum_size, maximum_size, threads, memory, outp
         seq_cluster.remove_int_files()
 
         if output_file:
-            logger.info("Saving results to file %s" % output_file)
+            click.echo("Saving results to file %s" % output_file)
             clustered_seqs.to_csv(output_file, sep='\t', index=False)
 
         return clustered_seqs

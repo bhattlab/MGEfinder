@@ -22,7 +22,7 @@ rule all:
     input:
         expand(join(RESULTS_DIR, '{genome}/04.makefasta.{genome}.all_seqs.fna'), genome=GENOMES)
     run:
-        print("INSERTOME PIPELINE FINISHED WITH NO EXCEPTIONS!")
+        pass
 
 
 rule index_genome_bowtie2:

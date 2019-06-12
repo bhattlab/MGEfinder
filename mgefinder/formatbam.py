@@ -1,15 +1,14 @@
 import warnings
 warnings.filterwarnings("ignore")
 import sys
-import click
-from mgefinder import bwatools, samtools
+from mgefinder import samtools
 from os.path import dirname, basename, join, isfile
 import pysam
 from snakemake import shell
-import pygogo as gogo
+import click
 
 verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
+
 
 
 def read_sam_pairs(samfile):
@@ -60,38 +59,38 @@ def format_for_mgefinder(in_sam, out_bam, read_format='rb', delete_in_sam=False)
 
 def _formatbam(in_sam, out_bam, single_end, keep_tmp_files):
 
-    logger.info("Removing secondary alignments...")
+    click.echo("Removing secondary alignments...")
     tmp_cleaned_bam = join(dirname(out_bam), '.'.join(basename(out_bam).split('.')[:-1]) + '.cleaned.bam.tmp')
     sorted_query_name = samtools.remove_secondary_alignments(in_sam, tmp_cleaned_bam, delete_in_bam=False)
     if not sorted_query_name:
-        logger.info("Fatal error: Failed to remove secondary alignments...")
+        click.echo("Fatal error: Failed to remove secondary alignments...")
         sys.exit()
-    logger.info("Successfully removed secondary alignments...\n")
+    click.echo("Successfully removed secondary alignments...\n")
 
     if not single_end:
-        logger.info("Formatting bam file for use by mgefinder...")
+        click.echo("Formatting bam file for use by mgefinder...")
         tmp_formatted_bam = join(dirname(out_bam), '.'.join(basename(out_bam).split('.')[:-1]) + '.formatted.bam.tmp')
         reformatted = format_for_mgefinder(tmp_cleaned_bam, tmp_formatted_bam, delete_in_sam=not keep_tmp_files)
         if not reformatted:
             logger.error("Fatal error: SAM file reformatting failed.")
             sys.exit()
-        logger.info("SAM file successfully reformatted...\n")
+        click.echo("SAM file successfully reformatted...\n")
     else:
         tmp_formatted_bam = tmp_cleaned_bam
 
-    logger.info("Sorting the BAM file by chromosomal location...")
+    click.echo("Sorting the BAM file by chromosomal location...")
     sorted_bam = samtools.sort_coordinate(tmp_formatted_bam, out_bam, delete_in_bam=not keep_tmp_files)
     if not sorted_bam:
         logger.error("Fatal error: Failed to sort the BAM file.")
         sys.exit()
-    logger.info("BAM file successfully sorted...\n")
+    click.echo("BAM file successfully sorted...\n")
 
-    logger.info("Index the sorted BAM file...")
+    click.echo("Index the sorted BAM file...")
     indexed = samtools.index(out_bam)
     if not indexed:
-        logger.info("Fatal error: Failed to index sorted BAM file")
+        click.echo("Fatal error: Failed to index sorted BAM file")
         sys.exit()
-    logger.info("BAM file successfully indexed...\n")
+    click.echo("BAM file successfully indexed...\n")
 
 
 if __name__ == '__main__':

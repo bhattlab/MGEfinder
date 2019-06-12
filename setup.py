@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="mgefinder",
-    version='0.0.1.dev6',
+    version='0.0.1.dev7',
     description='A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates.',
     url='https://github.com/bhattlab/MGEfinder',
     author="Matt Durrant",
@@ -12,7 +12,6 @@ setup(
     include_package_data=True,
     install_requires=[
         'click',
-        'pygogo',
         'pandas',
         'biopython',
         'pysam',

@@ -4,10 +4,7 @@ from mgefinder import sctools
 from mgefinder.find import SoftclipParser, SoftclipSite
 import pandas as pd
 import pysam
-import pygogo as gogo
-
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
+import click
 
 
 def _recall(pairsfile, bamfile, min_alignment_quality, min_alignment_inner_length, large_insertion_cutoff, output_file):
@@ -20,7 +17,7 @@ def _recall(pairsfile, bamfile, min_alignment_quality, min_alignment_inner_lengt
     recall_out = recaller.make_dataframe()
 
     if output_file:
-        logger.info("Saving results to file %s" % output_file)
+        click.echo("Saving results to file %s" % output_file)
         recall_out.to_csv(output_file, sep='\t', index=False)
 
     return recall_out
@@ -47,7 +44,7 @@ class Recaller(SoftclipParser):
 
     def parse_clipped_and_unclipped_read_info(self):
         if verbose:
-            logger.info("Getting clipped and unclipped read information near softclipped sites...")
+            click.echo("Getting clipped and unclipped read information near softclipped sites...")
             pass
 
         for contig in self.softclipped_sites:

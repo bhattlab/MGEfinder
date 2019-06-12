@@ -1,21 +1,16 @@
 import sys
 import warnings
 warnings.filterwarnings("ignore")
-import click
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 import pandas as pd
-import pygogo as gogo
+import click
 from collections import OrderedDict
 from collections import defaultdict
 from Bio.pairwise2 import format_alignment
 from Bio import pairwise2
 
 verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
-
-
-import warnings
-warnings.filterwarnings("ignore", message="numpy.dtype size changed")
-warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 
 def _inferseq_overlap(pairsfile, min_overlap_score, min_overlap_perc_identity, min_inferseq_size, output_file):
@@ -25,14 +20,14 @@ def _inferseq_overlap(pairsfile, min_overlap_score, min_overlap_perc_identity, m
 
     handle_empty_pairsfile(pairs, output_file)
 
-    logger.info("Inferring sequences from overlap...")
+    click.echo("Inferring sequences from overlap...")
     sequences_inferred_from_overlap = infer_sequences_overlap(pairs, min_overlap_score, min_overlap_perc_identity)
     method1 = make_dataframe(sequences_inferred_from_overlap, method='inferred_overlap')
 
     method1.loc[:, 'pair_id'] = list(map(str, map(int, list(method1['pair_id']))))
     method1 = method1.query("inferred_seq_length >= @min_inferseq_size")
 
-    logger.info("Writing results to file %s..." % output_file)
+    click.echo("Writing results to file %s..." % output_file)
 
     if pairs.shape[0] > 0:
         sample_id = list(pairs['sample'])[0]
@@ -171,7 +166,7 @@ def handle_empty_pairsfile(pairs, output_file):
             output_file = 'mgefinder.inferseq_overlap.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
-        logger.info("Empty pairs file, exiting...")
+        click.echo("Empty pairs file, exiting...")
         sys.exit()
 
 def merge_overlapping_sequences(start_seq, overlap_seq1, overlap_seq2, end_seq):

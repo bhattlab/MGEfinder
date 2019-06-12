@@ -1,13 +1,16 @@
 import sys
 import warnings
 warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", message="numpy.dtype size changed")
+warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
+
 import pandas as pd
 from mgefinder import fastatools
 from mgefinder import bowtie2tools
 from mgefinder import sctools
 from mgefinder import misc
 from mgefinder import pysamtools
-import pygogo as gogo
+import click
 import pysam
 from Bio import SeqIO
 from collections import OrderedDict
@@ -15,14 +18,6 @@ from os.path import dirname, join
 from random import randint
 from snakemake import shell
 from collections import defaultdict
-
-verbose=True
-logger = gogo.Gogo(__name__, verbose=verbose).logger
-
-
-import warnings
-warnings.filterwarnings("ignore", message="numpy.dtype size changed")
-warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 
 
 def _inferseq_database(pairsfile, inferseq_database, min_perc_identity, max_internal_softclip_prop,
@@ -39,7 +34,7 @@ def _inferseq_database(pairsfile, inferseq_database, min_perc_identity, max_inte
 
     handle_empty_pairsfile(pairs, output_file)
 
-    logger.info("Aligning pairs to database...")
+    click.echo("Aligning pairs to database...")
     assembly_termini_fasta_prefix = write_termini_to_align_to_database(pairs, tmp_dir)
     assembly_outbam = join(tmp_dir, 'mgefinder.inferseq_database.' + str(randint(0, 1e20)) + '.bam')
     bowtie2tools.align_fasta_to_genome(
@@ -48,7 +43,7 @@ def _inferseq_database(pairsfile, inferseq_database, min_perc_identity, max_inte
         additional_flags='--all --score-min G,1,5'
     )
 
-    logger.info("Inferring sequences from pairs aligned to database...")
+    click.echo("Inferring sequences from pairs aligned to database...")
     sequences_inferred_database = infer_sequences_database(assembly_outbam, database_dict,
                                                            min_perc_identity, max_internal_softclip_prop, max_edge_distance)
 
@@ -64,7 +59,7 @@ def _inferseq_database(pairsfile, inferseq_database, min_perc_identity, max_inte
     all_inferred_results.loc[:, 'pair_id'] = list(map(str, map(int, list(all_inferred_results['pair_id']))))
     all_inferred_results = all_inferred_results.query("inferred_seq_length > 0")
 
-    logger.info("Writing results to file %s..." % output_file)
+    click.echo("Writing results to file %s..." % output_file)
 
     if not output_file:
         output_file = 'mgefinder.inferseq_database.tsv'
@@ -324,9 +319,9 @@ def keep_best_alignment_score(reads):
 def index_database(inferseq_database):
 
     if not bowtie2tools.genome_is_indexed(inferseq_database):
-        logger.info("Indexing inferseq database...")
+        click.echo("Indexing inferseq database...")
         bowtie2tools.index_genome(inferseq_database)
-    logger.info("Database has been indexed...")
+    click.echo("Database has been indexed...")
 
 
 def write_termini_to_align_to_database(pairs, tmp_dir):
@@ -358,5 +353,5 @@ def handle_empty_pairsfile(pairs, output_file):
             output_file = 'mgefinder.inferseq_database.tsv'
 
         outfile.to_csv(output_file, sep='\t', index=False)
-        logger.info("Empty pairs file, exiting...")
+        click.echo("Empty pairs file, exiting...")
         sys.exit()
