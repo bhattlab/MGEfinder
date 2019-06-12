@@ -1,0 +1,67 @@
+{% set name = "mgefinder" %}
+{% set version = "0.0.1.dev4" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: "93dbcfd4777e2200cd73a71f8746adee2c7b5d9ff1eb4fb05cd413b406f0046f"
+
+build:
+  number: 0
+  entry_points:
+    - mgefinder = mgefinder.main:cli
+  script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv; pip install jellyfish"
+
+requirements:
+  host:
+    - biopython
+    - click
+    - cython
+    - jellyfish
+    - pandas
+    - pip
+    - pysam
+    - python
+    - scipy
+    - networkx
+    - tqdm
+    - snakemake
+  run:
+    - biopython
+    - click
+    - cython
+    - jellyfish
+    - pandas
+    - pysam
+    - python
+    - scipy
+    - networkx
+    - tqdm
+    - snakemake
+    - samtools
+    - emboss
+    - bowtie2
+    - cd-hit
+
+
+test:
+  imports:
+    - mgefinder
+  commands:
+    - mgefinder --help
+
+about:
+  home: "https://github.com/bhattlab/MGEfinder"
+  license: "MIT"
+  license_family: "MIT"
+  license_file: ""
+  summary: "A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates."
+  doc_url: ""
+  dev_url: ""
+
+extra:
+  recipe-maintainers:
+    - bhattlab
