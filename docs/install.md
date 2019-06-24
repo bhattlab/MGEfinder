@@ -1,43 +1,29 @@
 [Back to main page](../README.md)  
 
 # Installing *mgefinder*
+*MGEfinder* is currently only available on linux-64 systems.
+
 First, install [miniconda3](https://conda.io/en/master/miniconda.html). This is an environment management system that 
 should keep everything organized.
 
-Once installed, you have two options for downloading mgefinder:
+Once installed, we recommend installing *MGEfinder* as follows:
 
-1) To download the current development version:
-
-        git clone https://github.com/durrantmm/mgefinder.git
-        cd mgefinder
-
-2) To download the most recent *mgefinder* release:
-
-        wget https://github.com/durrantmm/mgefinder/archive/v1.0.0.tar.gz
-        tar -zxvf v1.0.0.tar.gz
-        rm v1.0.0.tar.gz
-        cd mgefinder-1.0.0
+1) Activate your conda environment or create a new conda environment:
     
-Install the mgefinder conda environment and other dependencies with
-
-    bash install.sh
-
-Now activate the environment with
+        conda create -n mgefinder
+        source activate mgefinder
     
-    source activate mgefinder
-    
-This activation step must be repeated whenever using *mgefinder*.
+    This environemnt activation step must be repeated whenever using *MGEfinder*.
 
-Now install *mgefinder* with the command
+2) Now install *mgefinder* with the command
 
-    pip install .
+        conda install -c bioconda -c conda-forge -c anaconda -c mdurrant mgefinder 
     
 Once complete, you can check to see if *mgefinder* installed properly by simply typing
 
     mgefinder
    
 This can then be called from anywhere on the file system while in the `mgefinder` conda environment.
-
 
 [NEXT: Step-by-step tutorial](tutorial.md)
 

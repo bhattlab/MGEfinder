@@ -2,228 +2,220 @@
 
 # Tutorial
 
-This tutorial will analyze a single *E. coli* isolate using the *mgefinder* command-line tool.
-
-We have selected the SRA sample with the Run ID SRR3180793. This is an E. coli isolate sequenced as part of the CDC's
-PulseNet program. In our own analysis, we found that this isolate had an especially high number of insertions.
+This tutorial will analyze ten *E. faecium* isolates using the *MGEfinder* command-line tool.
+In our own analysis, we found that *E. faecium* isolates had especially high numbers of novel insertions.
 
 ## Downloading the test dataset
-The test dataset includes about 460 MB of compressed data. It can be downloaded using the following commands:
+The test dataset includes about 2.4 GB of compressed data. It can be downloaded using the following commands:
 
-    wget https://s3-us-west-1.amazonaws.com/mdurrant/mgefinder/mgefinder_test_dataset.tar.gz
-    tar -zxvf mgefinder_test_dataset.tar.gz
-    rm mgefinder_test_dataset.tar.gz
-    cd mgefinder_test_dataset
+    wget https://mdurrant.s3-us-west-1.amazonaws.com/mustache/test_workdir.tar.gz
+    tar -zxvf test_workdir.tar.gz
+    rm test_workdir.tar.gz
 
-In the test dataset are 5 files that will be used in this tutorial:
-* `CFT073.fna` - the E. coli reference genome that we will use for this analysis.
-* `query_database.fna` - A database of genetic elements that we can use as a query.
-* `SRR3180793.CFT073.bam` - The SRR3180793 reads aligned to the `CFT073.fna` genome.
-* `SRR3180793.CFT073.bam.bai` - The BAM index produced using the `samtools index` command. 
-* `SRR3180793.contigs.fna` - The contigs generated from genomic assembly of the SRR3180793 FASTQ files.
+
+This will result in a new "working directory" with the test data inside called `test_workdir`. The complete *MGEfinder* workflow 
+several includes different steps that can be run using their individual commands. But all of these steps have been combined into 
+a single command called `workflow`, which can be run on a properly formatted working directory.
+
+
+    test_workdir/
+    ├── 00.assembly/
+    │   ├── ERR1036032.fna
+    │   ├── ERR1036049.fna
+    │   ├── ERR1036051.fna
+    │   ├── ERR1078777.fna
+    │   ├── ERR1078789.fna
+    │   ├── ERR1195862.fna
+    │   ├── ERR1541798.fna
+    │   ├── ERR1541854.fna
+    │   └── ERR1541922.fna
+    ├── 00.bam/
+    │   ├── ERR1036032.efae_GCF_900639545.bam
+    │   ├── ERR1036032.efae_GCF_900639545.bam.bai
+    │   ├── ERR1036049.efae_GCF_900639545.bam
+    │   ├── ERR1036049.efae_GCF_900639545.bam.bai
+    │   ├── ERR1036051.efae_GCF_900639545.bam
+    │   ├── ERR1036051.efae_GCF_900639545.bam.bai
+    │   ├── ERR1078777.efae_GCF_900639545.bam
+    │   ├── ERR1078777.efae_GCF_900639545.bam.bai
+    │   ├── ERR1078789.efae_GCF_900639545.bam
+    │   ├── ERR1078789.efae_GCF_900639545.bam.bai
+    │   ├── ERR1195862.efae_GCF_900639545.bam
+    │   ├── ERR1195862.efae_GCF_900639545.bam.bai
+    │   ├── ERR1541798.efae_GCF_900639545.bam
+    │   ├── ERR1541798.efae_GCF_900639545.bam.bai
+    │   ├── ERR1541854.efae_GCF_900639545.bam
+    │   ├── ERR1541854.efae_GCF_900639545.bam.bai
+    │   ├── ERR1541922.efae_GCF_900639545.bam
+    │   ├── ERR1541922.efae_GCF_900639545.bam.bai
+    │   ├── ERR1541932.efae_GCF_900639545.bam
+    │   └── ERR1541932.efae_GCF_900639545.bam.bai
+    └── 00.genome/
+        └── efae_GCF_900639545.fna
+        
 
 ## Generating the test dataset
 We have provided these files to limit computation time to complete this tutorial. Here, we show you how these files 
-were generated so that you can analyze your own raw data in the future.
+were generated and how the working directory is organized so that you can analyze your own raw data in the future.
 
 Skip to the next section if this is not of interest to you.
 
-First, you can download the SRA run file using the [sra-tools](https://github.com/ncbi/sra-tools) command: 
+First, you can download the SRA run files using the [sra-tools](https://github.com/ncbi/sra-tools) command: 
 
-    fastq-dump --gzip --split-files SRR3180793
+    fastq-dump --gzip --split-files ERR1036032
     
 These FASTQ files were then deduplicated using the [SuperDeduper](https://github.com/ibest/HTStream) command from the 
 HTStream toolset with the following command:
     
-    hts_SuperDeduper -g -1 SRR3180793_1.fastq.gz -2 SRR3180793_2.fastq.gz -p SRR3180793.nodup
+    hts_SuperDeduper -g -1 ERR1036032_1.fastq.gz -2 ERR1036032_2.fastq.gz -p ERR1036032.nodup
  
 And then the FASTQ files were trimmed using the 
 [Trime Galore](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) package and the command:
 
-    trim_galore --fastqc --paired SRR3180793.nodup_R1.fastq.gz SRR3180793.nodup_R2.fastq.gz
+    trim_galore --fastqc --paired ERR1036032.nodup_R1.fastq.gz ERR1036032.nodup_R2.fastq.gz
     
 The reference genome was indexed for alignment with [BWA MEM](http://bio-bwa.sourceforge.net/) and the alignment was 
 performed using the commands:
 
-    bwa index CFT073.fna
-    bwa mem CFT073.fna SRR3180793.nodup_R1_val_1.fq.gz SRR3180793.nodup_R2_val_2.fq.gz > SRR3180793.CFT073.sam
+    bwa index efae_GCF_900639545.fna
+    bwa mem efae_GCF_900639545.fna ERR1036032.nodup_R1_val_1.fq.gz ERR1036032.nodup_R2_val_2.fq.gz > ERR1036032.efae_GCF_900639545.sam
 
 There is a built-in command in *mgefinder*, called `mgefinder formatbam` which takes this SAM file and prepares it for 
 analysis by *mgefinder*:
 
-    mgefinder formatbam SRR3180793.CFT073.sam SRR3180793.CFT073.bam
+    mgefinder formatbam ERR1036032.efae_GCF_900639545.sam ERR1036032.efae_GCF_900639545.bam
 
-This step generates the `SRR3180793.CFT073.bam` and `SRR3180793.CFT073.bam.bai` files that we have already 
+This step generates the `ERR1036032.efae_GCF_900639545.bam` and `ERR1036032.efae_GCF_900639545.bam.bai` files that we have already 
 provided to you for this tutorial.
 
-Finally, to generate the assembled contig file `SRR3180793.contigs.fna`, you can use the 
+We are working to remove this step so that you can use BAM files without this, but for the time being it is best to use 
+this step when possible.
+
+Finally, to generate the assembled contig file `ERR1036032.fna`, you can use the 
 [SPAdes](http://cab.spbu.ru/software/spades/) command:
 
-    spades.py -1 SRR3180793.nodup_R1_val_1.fq.gz -2 SRR3180793.nodup_R2_val_2.fq.gz -o SRR3180793
+    spades.py -1 ERR1036032.nodup_R1_val_1.fq.gz -2 ERR1036032.nodup_R2_val_2.fq.gz -o ERR1036032
     
-The assembled contigs are available in the `SRR3180793/contigs.fasta` file.
+The assembled contigs are available in the `ERR1036032/contigs.fasta` file.
 
-The query database `query_database.fna` was generated from our analysis of thousands of randomly downloaded *E. coli* 
-isolates available in the SRA database. A description of how this file was generated is available in our 
-[preprint](https://www.biorxiv.org/content/10.1101/527788v1).
+We repeated these steps for all ten isolates. We then organized these files into a working directory. It is imperative
+when you make your own working directories, you use this directory structure and file names:
 
+    workdir/
+        ├── 00.assembly/
+        │   ├── <sample1>.fna
+        │   ├── <sample1>.fna
+        │   └── <sample1>.fna
+        ├── 00.bam/
+        │   ├── <sample1>.<genome>.bam
+        │   ├── <sample1>.<genome>.bam.bai
+        │   ├── <sample2>.<genome>.bam
+        │   ├── <sample2>.<genome>.bam.bai
+        │   ├── <sample3>.<genome>.bam
+        │   └── <sample3>.<genome>.bam.bai
+        └── 00.genome/
+            └── <genome>.fna
 
-## Analyzing the test dataset using *mgefinder*
+Be sure to keep the file naming consistent with what is shown above, including directory names and suffixes. 
+`<genome>` refers to the name of the genome to which the sample was aligned. Files in the directory can be symlinks to 
+the actual files. 
 
-We present a simple tutorial designed to explain key parts of the *mgefinder* workflow.
+## Analyzing the test dataset using *mgefinder workflow*
 
-### `mgefinder findflanks`
-Once a properly formatted BAM file is available, you can run the `findflanks` command in *mgefinder*. This command is
-described in greater detail [here](manual.md). You can run this command on the test dataset as:
-  
-    mgefinder findflanks SRR3180793.CFT073.bam
+This working directory can be analyzed using a single command:
 
-This will generate a file called `mgefinder.findflanks.tsv`. Alternatively, you can specify the filename using:
-
-    mgefinder findflanks SRR3180793.CFT073.bam -o SRR3180793.findflanks.tsv
+    mgefinder workflow test_workdir/
     
-This step should take about 3.5 minutes to complete for this sample.
-The output file includes the consensus flanks generated from analyzing the clipped-ends of reads aligned to the 
-CFT073 E. coli genome, and information about the reads that support the existence of each flank. For more information 
-about this file, please read the [manual](manual.md).
+This will begin running a snakemake workflow that will execute all steps in the *MGEfinder* pipeline on the
+contents of the working directory.
 
-### `mgefinder pairflanks`
-The next step is to pair these candidate flanks together, giving us a candidate pair that represents the 5' and 3' 
-flanks of the insertion. This is performed using the `pairflanks` command in `mgefinder` as follows:
+We tested this workflow on a Google Cloud Virtual machine with 4 vCPUs and 26 GB memory. By default, `mgefinder
+workflow` uses one core. This default setting takes 7 min 37 seconds to analyze these 10 isolates. The number of
+cores can be increased:
 
-    mgefinder pairflanks mgefinder.findflanks.tsv SRR3180793.CFT073.bam CFT073.fna
+    mgefinder workflow --cores 4 test_workdir/
 
-This step should take about 1 minute to complete. As you can see, this requires as input the `mgefinder.findflanks.tsv` 
-file (the output of the `findflanks` command), the file `SRR3180793.CFT073.bam` (the alignment of the reads to the 
-reference genome), and the reference genome used `CFT073.fna`.
+Which takes 3 min 3 seconds on the same machine. Certain steps can be done in parallel, but there are bottlenecks.
+If you have hundreds of isolates and available memory, we recommend increasing the memory using `--memory` from
+the default of `--memory 16000` to `--memory 50000`, where the parameter is the amount of available memory in
+megabases.
 
-The output of this command is a file called `mgefinder.pairflanks.tsv`. This includes all of the candidate flank pairs 
-generated from analyzing the SRR3180793 sample, details about the reads supporting the insertion, and other important
-information that may be of interest to you in your own analysis. Please see details about this output file in the 
-[manual](manual.md).
+This workflow generates three more directories in the `test_workdir` working directory:
 
-### `mgefinder inferseq-reference`
-This next step is used to infer the identity of the candidate insertions that were identified in the `pairflanks` step.
-If you suspect that the inserted element already exists within the reference genome, as is often the case in a 
-adaptive laboratory evolution experiments, then be sure to use this command.
-
-While *mgefinder* will automatically index the reference genome if it is not already indexed, we recommend that you index
-the reference genome beforehand with the command:
-
-    bowtie2-build -o 0 -q CFT073.fna CFT073.fna
-
-You can then run the `inferseq-reference` command as:
-
-    mgefinder inferseq-reference mgefinder.pairflanks.tsv CFT073.fna
+    01.mgefinder
+    02.database
+    03.results
     
-This step should take about 5 seconds to complete. This command requires as input the file generated by the `pairflanks`
-command and the reference genome. The output of this command is in the `mgefinder.inferseq_reference.tsv` file. This file
-includes the elements that were inferred from the reference genome and are a possible source of the insertion. These 
-inferred sequences can be mapped back to the candidate insertions in the `mgefinder.pairflanks.tsv` file using the 
-`pair_id` column. Please see details about this output file in the [manual](manual.md).
+The `01.mgefinder` directory contains intermediate *MGEfinder* files that may be of interest to individuals with
+more advanced knowledge of how the tool works. This includes the output of the `find`, `pair`, and `inferseq`
+commands.
 
-### `mgefinder inferseq-assembly`
-This next step is used to infer the identity of the candidate insertions that were identified in the previous step.
-This step uses the assembled contigs of the isolate itself to infer the identity of the inserted elements. This is 
-useful when you suspect that the reference genome and the isolate are more distantly related, or that novel genetic material may
-be the source of the insertions.
+The `02.database` directory contains a dynamically-constructed database of identified elements that were 
+identified when running *MGEfinder*. These are necessary for the `inferseq-database` commands. This file
+may be of value to the user, depending on the use case.
 
-While *mgefinder* will automatically index the assembled contigs if it is not already indexed, we recommend that you index
-the assembled contigs beforehand with the command:
+Most of the files of value can be found in the `03.results` directory. In the case of this test dataset,
+the files that were generated are named:
 
-    bowtie2-build -o 0 -q SRR3180793.contigs.fna SRR3180793.contigs.fna
+    workdir/
+        └── efae_GCF_900639545/
+            ├── 01.clusterseq.efae_GCF_900639545.tsv
+            ├── 02.genotype.efae_GCF_900639545.tsv
+            ├── 03.summarize.efae_GCF_900639545.clusters.tsv
+            ├── 03.summarize.efae_GCF_900639545.groups.tsv
+            ├── 04.makefasta.efae_GCF_900639545.all_seqs.fna
+            └── 04.makefasta.efae_GCF_900639545.repr_seqs.fna
 
-You can then run the `inferseq-assembly` command as:
+The file `01.clusterseq.efae_GCF_900639545.tsv`. This is effectively a complete list of all inferred sequences
+for all ten files. This file includes the `sample`, `pair_id` (refers to results of the `pair` output files),
+`method` (sequence inference method, such as `inferred_assembly_with_full_context`), `loc` (the location
+of where the sequence was found, either in the reference genome, assembly, or dynamically-constructed database),
+the `inferred_seq_length`, the `seqid` (an identifier for each unique sequence), `cluster` (an identifier for the 
+sequence cluster), `group` (an identifier for the cluster group), and the `inferred_seq` (nucleotide sequence of
+the element).
 
-    mgefinder inferseq-assembly mgefinder.pairflanks.tsv SRR3180793.CFT073.bam SRR3180793.contigs.fna CFT073.fna
-    
-This step should take about 30 seconds to complete. This command requires as input the file generated by the `pairflanks`
-command, the file `SRR3180793.CFT073.bam` (the alignment of the reads to the reference genome), the assembled contigs, 
-and the reference genome. The output of this command is in the `mgefinder.inferseq_assembly.tsv` file. This file
-includes the elements that were inferred from the assembled contigs and are a possible source of the insertion. These 
-inferred sequences can be mapped back to the candidate insertions in the `mgefinder.pairflanks.tsv` file using the 
-`pair_id` column. Please see details about this output file in the [manual](manual.md).
+The file `02.genotype.efae_GCF_900639545.tsv` includes insertion genotypes for all of the isolates. This
+includes the `sample`, the position of the insertion within the reference genome, the `seqid`, `cluster`, and
+`group` that indicates the identity of the inserted sequence. The final column indicates the `conf` (confidence) 
+level of the insertion. This refers primarily to how the idnetity of the sequence was inferred. The highest confidence
+inferred sequence is `IAwFC`, which indicates that the insertion was found in the expected location in the
+assembly. The degree of confidence that you should accept depends largely on the use case. If, for example,
+you are performing a re-sequencing experiment, it may be sufficient to use the `IDB` column, which includes
+sequences inferred from the reference and dynamically-constructed database.
 
-### `mgefinder inferseq-overlap`
-This next step is used to infer the identity of the candidate insertions that were identified in the previous step.
-This step attempts to overlap the two candidate flanks to determine the identity of the full inserted element. This is 
-useful for inferring the identity of insertions that are relatively small, depending heavily on the length of the reads
-in the library.
+The files `03.summarize.efae_GCF_900639545.clusters.tsv` and `03.summarize.efae_GCF_900639545.groups.tsv` provide
+summary statistics for each of the sequence clusters and groups, respectively. This can be used to perform further
+QC on the identified elements, and to stratify elements by their transposability. Some important columns include 
+`num_unique_sites_all`, which refers to the number of unique sites in the reference genome where sequence cluster was
+found at least once in at least one isolate. and `num_unique_sites_unambig`, which refers to the number of unique sites
+where the cluster is the unambiguously assigned element (often two clusters will be assigned to a single site when the
+exact element cluster cannot be identified). See the manual for more details on these output files.
 
-You can run the `inferseq-overlap` command as:
-
-    mgefinder inferseq-overlap mgefinder.pairflanks.tsv
-    
-This step should take about 5 seconds to complete. This command only requires as input the file generated by the 
-`pairflanks` command. The output of this command is in the `mgefinder.inferseq_overlap.tsv` file. Again, this approach is
-limited by the length of the reads. These inferred sequences can be mapped back to the candidate insertions in the 
-`mgefinder.pairflanks.tsv` file using the `pair_id` column. Please see details about this output file in the 
-[manual](manual.md).
-
-
-### `mgefinder inferseq-database`
-This next step is used to infer the identity of the candidate insertions from a query database of previously identified
-insertions. This is useful when the insertions that you are looking for or already known, or you want to look for
-insertions that were identified when analyzing a different isolate. The database used in tutorial 
-`query_database.fna` was generated by running `mgefinder` on thousands of E. coli isolates, and compiling the identified
-insertions into a single fasta file. This is called a 'dynamically-constructed database' because it was generated from
-from using *mgefinder* itself on thousands of isolates, not from a curated online database.
-
-While *mgefinder* will automatically index the query database if it is not already indexed, we recommend that you index
-the query database beforehand with the command:
-
-    bowtie2-build -o 0 -q query_database.fna query_database.fna
-
-You can run the `inferseq-database` command as:
-
-    mgefinder inferseq-database mgefinder.pairflanks.tsv query_database.fna
-    
-This step should take about 10 seconds to complete. This command requires as input the file generated by the 
-`pairflanks` command, and the query database. The output of this command is in the `mgefinder.inferseq_database.tsv` 
-file. Please see details about this output file in the [manual](manual.md). This is arguably the most sensitive 
-approach, provided that the database contains all of the inserted elements of interest. 
-
-[Detailed user manual](manual.md)
+The files `04.makefasta.efae_GCF_900639545.all_seqs.fna` and `04.makefasta.efae_GCF_900639545.repr_seqs.fna` include FASTA
+files of all identified elements found in the `genotype` and `summarize` files. The `*.all_seqs.fna` includes all unique
+sequences identified (even if they differ by a single base pair), and `*.repr_seqs.fna` includes the representative
+sequence for each element cluster.
 
 ## Next steps
-This tutorial produced a list of candidate insertions for the E. coli isolate SRR3180793 (`mgefinder.pairflanks.tsv`), as
-well as the inferred identity of many of the insertions using a variety of inference techniques. Of the 149 candidate 
-insertions identified in the `mgefinder.pairflanks.tsv` file, a sequence was inferred for 137 using at least one of the
-inference approaches described here. Those candidate insertions whose identity could not be inferred may include large 
-genomic inversions, or insertions that were too complicated to be properly inferred from short-read sequencing using
-*mgefinder*.
+This tutorial produced a list of candidate integrative mobile genetic elements for these ten E. faecium isolates,
+and genotyped insertions with respect to an E. faecium reference genome. The next steps taken will depend largely on 
+the type of analysis that you want to perform. If you want to search these candidate insertions for antibiotic 
+resistance genes, you can upload the `04.makefasta.efae_GCF_900639545.all_seqs.fna` FASTA file to 
+to [ResFinder](https://cge.cbs.dtu.dk/services/ResFinder/). If you wish to identify transposases, we recommend
+the HMMs provided by [ISEScan](https://www.ncbi.nlm.nih.gov/pubmed/29077810). If you wish to identify prophage
+elements, you can upload the `04.makefasta.efae_GCF_900639545.repr_seqs.fna` file to [PHASTER](http://phaster.ca/).
 
-The next steps taken will depend largely on the type of analysis that you want to perform. If you want to search these
-candidate insertions for antibiotic resistance genes, you can create a FASTA file of the inferred sites and upload the file
-to [ResFinder](https://cge.cbs.dtu.dk/services/ResFinder/). Other more complicated analyses may require additional
-processing of the data. 
-
-A given candidate insertion may have multiple inferred sequences that belong to it. This ambiguity makes it difficult to
-make a final decision about the identity of a given insertion. A description of the approach that we took in our own
-analysis can be described in detail in our [preprint](https://www.biorxiv.org/content/10.1101/527788v1). Briefly,
-we chose to cluster all inferred sequences at 90% similarity across 85% of each sequence using CD-HIT-EST. This meant 
-that sequences that were highly similar to each other were assumed to be the same insertion. We then prioritized the 
-sequences that were inferred by the different inference methods described here. The `inferseq-assembly` step was given
-top priority, as these elements come directly from the organism's assembly, and are most likely very close to the true
-identity of the element. The `inferseq-overlap` sequences were given second priority. The `inferseq-database` and the
-`inferseq-reference` sequences were given last priority, meaning the inferred sequences here were only used if no
-`inferseq-assembly` or `inferseq-overlap` sequences could be inferred.
-
-Even still, ambiguities may exist. We tried to resolve some of these remaining ambiguities, and a description of the 
-approach we took can be found in our [preprint](https://www.biorxiv.org/content/10.1101/527788v1).
 
 ## Other considerations
 We hope we have made the limitations of this approach clear, and we urge you to carefully consider these limitations 
 when analyzing your own data.
 
 Some additional details to keep in mind:
-* *Mustache* is not designed to identify small insertions. If an insertion is smaller than your library's read length,
-we urge you to ignore them as they cannot be reliably identified. We recommend a lower size cutoff of 300 bp when
-analyzing sequences.
-* Similarly, *mgefinder* has not been evaluated with respect to very large insertions. The larger an insertion,
-the less likely that it will be able to assemble, and it will not be identified in the `inferseq-assembly` step. We
-used an upper cutoff of 10 kilobase pairs in our own analysis.
+* *Mustache* is not designed to identify very small insertions. By default it identifies insertions as small as 70 base
+pairs, and under certain conditions it can reliably identify insertions as short as 30 base pairs.
+* It is possible that some identified elements are in fact assembly errors, and we urge you to consider this when making
+conclusions about specific insertions.
 
-Good luck, and if you have any questions please submit an issue [here](https://github.com/durrantmm/mgefinder/issues).
+Good luck, and if you have any questions please submit an issue [here](https://github.com/bhattlab/MGEfinder/issues).
 
 [NEXT: Detailed User Manual](manual.md)
