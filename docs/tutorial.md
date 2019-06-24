@@ -205,16 +205,20 @@ to [ResFinder](https://cge.cbs.dtu.dk/services/ResFinder/). If you wish to ident
 the HMMs provided by [ISEScan](https://www.ncbi.nlm.nih.gov/pubmed/29077810). If you wish to identify prophage
 elements, you can upload the `04.makefasta.efae_GCF_900639545.repr_seqs.fna` file to [PHASTER](http://phaster.ca/).
 
+Please refer to the [manuscript](https://doi.org/10.1101/527788) for more ideas on how you can analyze your data.
 
 ## Other considerations
 We hope we have made the limitations of this approach clear, and we urge you to carefully consider these limitations 
 when analyzing your own data.
 
 Some additional details to keep in mind:
-* *Mustache* is not designed to identify very small insertions. By default it identifies insertions as small as 70 base
-pairs, and under certain conditions it can reliably identify insertions as short as 30 base pairs.
+* *MGEfinder* is not designed to identify very small indels. By default it identifies insertions as small as 70 base
+pairs, and under certain conditions it can reliably identify insertions as short as 30 base pairs. By default, the upper
+limit on the insertion size is 200 kbp.
 * It is possible that some identified elements are in fact assembly errors, and we urge you to consider this when making
 conclusions about specific insertions.
+* This workflow is not configured to handle resequencing experiments by default, please consider refer to the manual
+if you are analyzing resequencing data.
 
 Good luck, and if you have any questions please submit an issue [here](https://github.com/bhattlab/MGEfinder/issues).
 
