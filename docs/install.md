@@ -13,13 +13,13 @@ Once installed, we recommend installing *MGEfinder* as follows:
         conda create -n mgefinder
         source activate mgefinder
     
-    This environemnt activation step must be repeated whenever using *MGEfinder*.
+    This environment activation step must be repeated whenever using *MGEfinder*.
 
 2) Now install *mgefinder* with the command
 
         conda install -c bioconda -c conda-forge -c anaconda -c mdurrant mgefinder 
     
-Once complete, you can check to see if *mgefinder* installed properly by simply typing
+Once complete, you can check to see if *mgefinder* installed properly by typing
 
     mgefinder
    
