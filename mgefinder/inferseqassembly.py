@@ -38,6 +38,12 @@ def _inferseq_assembly(pairsfile, bamfile, inferseq_assembly, inferseq_reference
 
     inferred_sequences_with_context = context_inferer.infer_sequences()
 
+    if inferred_sequences_with_context.shape[0] > 0:
+        loc = list(inferred_sequences_with_context.loc[:,'loc'])
+        loc = [[l.split(':')[0]] + l.split(':')[-1].split('-') for l in loc]
+        loc = [l[0]+':'+str(int(l[1]) + context_width)+'-'+str(int(l[2]) - context_width) for l in loc]
+        inferred_sequences_with_context[['loc']] = loc
+
     nocontext_inferer = InferSequence(
         pairs, inferseq_assembly, min_perc_identity, max_internal_softclip_prop, max_inferseq_size,
         min_inferseq_size, keep_intermediate, 'inferred_assembly_without_context', tmp_dir
@@ -264,7 +270,6 @@ class AlignedPairsContext(AlignedPairs):
             if closest_pos is not None:
                 closest_reverse_read = self.reverse_reads_mate1_positions[read.reference_name][closest_pos]
 
-        print(read.query_name)
         return closest_reverse_read
 
 

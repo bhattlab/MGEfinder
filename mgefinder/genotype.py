@@ -4,7 +4,7 @@ import pandas as pd
 from collections import defaultdict
 import click
 from os.path import isfile
-
+import sys
 
 def _genotype(clusterseq, pairfiles, filter_clusters_inferred_assembly, output_file):
 
@@ -148,7 +148,7 @@ class Genotyper:
         IAwFC = self.combine_unresolved_seqs(IAwFC.drop(columns='method'))
 
         genotyped = IAwFC[['sample', 'pair_id']].drop_duplicates()
-        genotyped = genotyped.convert_objects(convert_numeric=True)
+        genotyped['pair_id'] = pd.to_numeric(genotyped['pair_id'])
 
         # IAwHC
         IAwHC = pd.merge(data, genotyped, on=['sample', 'pair_id'], how='outer', indicator=True)
@@ -159,7 +159,7 @@ class Genotyper:
         IAwHC = self.combine_unresolved_seqs(IAwHC.drop(columns='method'))
 
         genotyped = pd.concat([genotyped, IAwHC[['sample', 'pair_id']]]).drop_duplicates()
-        genotyped = genotyped.convert_objects(convert_numeric=True)
+        genotyped['pair_id'] = pd.to_numeric(genotyped['pair_id'])
 
         # IO
         IO = pd.merge(data, genotyped, on=['sample', 'pair_id'], how='outer', indicator=True)
@@ -170,7 +170,7 @@ class Genotyper:
         IO = self.combine_unresolved_seqs(IO.drop(columns='method'))
 
         genotyped = pd.concat([genotyped, IO[['sample', 'pair_id']]]).drop_duplicates()
-        genotyped = genotyped.convert_objects(convert_numeric=True)
+        genotyped['pair_id'] = pd.to_numeric(genotyped['pair_id'])
 
         # IAwoC
         IAwoC = pd.merge(data, genotyped, on=['sample', 'pair_id'], how='outer', indicator=True)
@@ -181,7 +181,7 @@ class Genotyper:
         IAwoC = self.combine_unresolved_seqs(IAwoC.drop(columns='method'))
 
         genotyped = pd.concat([genotyped, IAwoC[['sample', 'pair_id']]]).drop_duplicates()
-        genotyped = genotyped.convert_objects(convert_numeric=True)
+        genotyped['pair_id'] = pd.to_numeric(genotyped['pair_id'])
 
         # IDB
         IDB = pd.merge(data, genotyped, on=['sample', 'pair_id'], how='outer', indicator=True)
@@ -191,7 +191,10 @@ class Genotyper:
         IDB['conf'] = 'IDB'
         IDB = self.combine_unresolved_seqs(IDB.drop(columns='method'))
 
-        return IAwFC.append(IAwHC).append(IO).append(IAwoC).append(IDB).drop_duplicates().convert_objects(convert_numeric=True)
+        out = IAwFC.append(IAwHC).append(IO).append(IAwoC).append(IDB).drop_duplicates()
+        out['pair_id'] = pd.to_numeric(out['pair_id'])
+
+        return out
 
     def resolve_ambiguous_genotypes(self, data):
 

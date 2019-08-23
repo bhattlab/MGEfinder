@@ -9,6 +9,7 @@ from scipy.sparse.csgraph import connected_components
 import numpy as np
 from tqdm import tqdm
 import click
+sys.setrecursionlimit(5000)
 
 
 

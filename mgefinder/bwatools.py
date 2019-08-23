@@ -43,7 +43,6 @@ def align_to_genome_pe(fastq1, fastq2, genome_path, out_sam, threads=1, verbose=
         command = "bwa mem -t {threads} {genome_path} {fastq1} {fastq2} 2> /dev/null 1> {out_sam}; ".format(
             genome_path=genome_path, fastq1=fastq1, fastq2=fastq2, out_sam=out_sam, threads=threads)
 
-    logger.debug("Executing command: %s" % command)
     shell(command)
 
     if isfile(out_sam):
@@ -59,7 +58,6 @@ def align_to_genome_se(fastq1, genome_path, out_sam, threads=1, verbose=False):
         command = "bwa mem -t {threads} {genome_path} {fastq1} 2> /dev/null 1> {out_sam}; ".format(
             genome_path=genome_path, fastq1=fastq1, out_sam=out_sam, threads=threads)
 
-    logger.debug("Executing command: %s" % command)
     shell(command)
 
     if isfile(out_sam):
@@ -77,7 +75,6 @@ def align_to_genome_fasta_pe(fasta1, fasta2, genome_path, out_sam, threads=1, ve
             genome_path=genome_path, fastq1=fasta1, fastq2=fasta2, out_sam=out_sam, threads=threads,
             additional_flags=additional_flags)
 
-    logger.debug("Executing command: %s" % command)
     shell(command)
 
     if isfile(out_sam):
@@ -106,7 +103,6 @@ def align_fasta_to_genome(fasta, genome_path, out_bam, threads=1, silence=True, 
                   "rm -f {out_bam}.sam {out_bam}.sam.secseq {out_bam}.sam.tmp".format(
             genome_path=genome_path, fasta=fasta, out_bam=out_bam, threads=threads, additional_flags=additional_flags)
 
-    #print(command)
     shell(command1)
     add_sequence_to_secondary_alignment('{out_bam}.sam'.format(out_bam=out_bam),
                                         '{out_bam}.sam.secseq'.format(out_bam=out_bam))

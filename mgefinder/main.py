@@ -16,6 +16,7 @@ from mgefinder.clusterseq import _clusterseq
 from mgefinder.genotype import _genotype
 from mgefinder.summarize import _summarize
 from mgefinder.makefasta import _makefasta
+from mgefinder.wholegenome import _wholegenome
 
 import click
 from os.path import join, dirname, abspath
@@ -68,7 +69,7 @@ def getworkflow():
 @click.option('--max_indel_ratio', '-maxir', default=0.03, help="For a softclipped site to be considered, the proportion of small insertions/deletions at this site must not be above this value. default=0.03")
 @click.option('--large_insertion_cutoff', '-lins', default=30, help="Keep large insertions if they meet this length.")
 @click.option('--min_count_consensus', '-mcc', default=2, help="When building the consensus sequence, stop building consensus if read count drops below this cutoff. default=2")
-@click.option('--sample_id', '-id', default=None, help="Specify an ID to use for this sample, default is the absolute path to the output file.")
+@click.option('--sample_id', '-id', default=None, help="Specify an ID to use for this sample, default is the absolute path to the bam file")
 @click.option('--output_file', '-o', default='mgefinder.find.tsv', help="The output file to save the results. default=mgefinder.find.tsv")
 def find(bamfile, min_softclip_length, min_softclip_count, min_alignment_quality, min_alignment_inner_length,
                min_distance_to_mate, min_softclip_ratio, max_indel_ratio, large_insertion_cutoff,
@@ -76,7 +77,7 @@ def find(bamfile, min_softclip_length, min_softclip_count, min_alignment_quality
     """A click access point for the find module. This is used for creating the command line interface."""
 
     if sample_id is None:
-        sample_id = abspath(output_file)
+        sample_id = abspath(bamfile)
 
     log_params(command='find',
                  bamfile=bamfile, min_softclip_length=min_softclip_length, min_softclip_count=min_softclip_count,
@@ -276,6 +277,30 @@ def recall(pairsfile, bamfile, min_alignment_quality, min_alignment_inner_length
                min_alignment_inner_length=min_alignment_inner_length, large_insertion_cutoff=large_insertion_cutoff,
                output_file=output_file)
     _recall(pairsfile, bamfile, min_alignment_quality, min_alignment_inner_length, large_insertion_cutoff, output_file)
+
+@cli.command(short_help='Identify insertions using whole-genome alignments of complete genomes.', help_priority=16)
+@click.argument('reference', type=click.Path(exists=True))
+@click.argument('query', type=click.Path(exists=True))
+@click.option('--read_length', '-rl', default=500, help="The length of the reads to simulate. Sets an effective minimum size for identified insertions. default=100")
+@click.option('--read_depth', '-rd', default=5, help="The depth of coverage produced to compare genomes. default=5")
+@click.option('--min_alignment_quality', '-minq', default=20, help="For a read to be considered, it must meet this alignment quality cutoff. default=20")
+@click.option('--max_direct_repeat_length', '-maxdr', default=20, help="Only call insertions where the predicted direct repeat length is at most {max_direct_repeat_length}. default=20.")
+@click.option('--large_insertion_cutoff', '-lins', default=30, help="Same parameter as that used for find command.")
+@click.option('--query_id', '-id', default=None, help="Specify an ID to use for this query, default is the absolute path to the query file.")
+@click.option('--output_prefix', '-o', default='mgefinder.wholegenome', help="The output file to save results to. default=mgefinder.wholegenoome.tsv")
+def wholegenome(reference, query, read_length, read_depth, min_alignment_quality, max_direct_repeat_length, large_insertion_cutoff, query_id, output_prefix):
+
+    if query_id is None:
+        query_id = abspath(query)
+
+    log_params(command='recall', reference=reference, query=query,
+               read_length=read_length, read_depth=read_depth,
+               min_alignment_quality=min_alignment_quality,
+               max_direct_repeat_length=max_direct_repeat_length,
+               large_insertion_cutoff=large_insertion_cutoff,
+               query_id=query_id, output_prefix=output_prefix)
+    _wholegenome(reference, query, read_length, read_depth, min_alignment_quality,
+                 max_direct_repeat_length, large_insertion_cutoff, query_id, output_prefix)
 
 
 def log_params(**kwargs):
