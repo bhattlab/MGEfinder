@@ -282,7 +282,7 @@ class FlankPairer:
         return flank_pairs
 
 
-    def get_read_direct_repeats(self, positions, genome_dict, target_region_size=50):
+    def get_read_direct_repeats(self, positions, genome_dict, target_region_size=100):
 
         direct_repeats = []
         for index, row in positions.iterrows():
