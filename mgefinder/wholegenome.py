@@ -62,10 +62,12 @@ def make_reads(genome, out_fastq, readlength, depth):
 
     with open(out_fastq, 'w') as out:
         step = int(readlength / depth)
+        recnum = 0
         for rec in SeqIO.parse(genome, 'fasta'):
             for i in range(0, len(rec.seq)-readlength, step):
+                recnum += 1
                 outread = rec.seq[i:i + readlength]
-                out.write('@SEQ' + str(i) + '\n')
+                out.write('@SEQ' + str(recnum) + '\n')
                 out.write(str(outread) + '\n+\n')
                 out.write('F'*len(outread) + '\n')
     return out_fastq
