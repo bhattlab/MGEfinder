@@ -122,7 +122,7 @@ class FlankPairer:
     def get_header_list(self):
         header = ['pair_id', 'contig', 'pos_5p', 'pos_3p', 'softclip_count_5p', 'softclip_count_3p',
                   'total_count_5p', 'total_count_3p', 'spanning_count', 'has_IR', 'IR_length', 'IR_5p', 'IR_3p',
-                  'seq_5p', 'seq_3p',  'direct_repeat_reference', 'direct_repeat_reads_consensus']
+                  'seq_5p', 'seq_3p',  'direct_repeat_reference']
 
         return header
 
@@ -275,79 +275,10 @@ class FlankPairer:
 
         genome_dict = {rec.id: rec.seq for rec in SeqIO.parse(self.genome, 'fasta')}
         positions = self.get_reference_direct_repeats(flank_pairs, genome_dict)
-        positions = self.get_read_direct_repeats(positions, genome_dict)
 
-        flank_pairs = flank_pairs.drop(['direct_repeat_reference', 'direct_repeat_reads_consensus'], axis=1).merge(positions, how='left')
-
+        flank_pairs = flank_pairs.drop(['direct_repeat_reference'], axis=1).merge(positions, how='left')
+ 
         return flank_pairs
-
-
-    def get_read_direct_repeats(self, positions, genome_dict, target_region_size=100):
-
-        direct_repeats = []
-        for index, row in positions.iterrows():
-            contig, start, end = row['contig'], row['pos_3p'], row['pos_5p']
-
-            direct_repeat_center = round((end + start) / 2)
-            expanded_start = int(direct_repeat_center - (target_region_size / 2))
-            expanded_end = int(direct_repeat_center + (target_region_size / 2))
-
-            add_start_n = 0
-            add_end_n = 0
-            if expanded_start < 0:
-                add_start_n = abs(expanded_start)
-                expanded_start = 0
-            if expanded_end > len(genome_dict[contig]):
-                add_end_n = expanded_end - len(genome_dict[contig])
-                expanded_end = len(genome_dict[contig])
-
-            target_region = 'N' * add_start_n + genome_dict[contig][expanded_start:expanded_end] + 'N' * add_end_n
-            target_region_positions = range(expanded_start, expanded_end)
-
-            target_region_reads = self.initialize_target_region_reads(target_region, expanded_start, expanded_end)
-            for read in self.bam.fetch(contig, expanded_start, expanded_end):
-                ref_positions = read.get_reference_positions(full_length=True)
-                read_query = read.query_sequence
-                read_qualities = read.query_qualities
-
-                i = 0
-                for pos in ref_positions:
-                    if pos is not None and pos in target_region_reads:
-                        target_region_reads[pos][read_query[i]] += read_qualities[i]
-                    i += 1
-
-            consensus_target_region = self.get_consensus_target_region(target_region_reads)
-            consensus_direct_repeat = consensus_target_region[target_region_positions.index((start+1)):target_region_positions.index(end)]
-
-            direct_repeats.append(consensus_direct_repeat)
-
-        positions['direct_repeat_reads_consensus'] = direct_repeats
-
-        return positions
-
-
-    def get_consensus_target_region(self, target_region_reads):
-        start, end = min(target_region_reads.keys()), max(target_region_reads.keys())+1
-        consensus = ''
-        for pos in range(start, end):
-            best_qual = 0
-            best_nuc = ''
-            for nuc in target_region_reads[pos]:
-                qual = target_region_reads[pos][nuc]
-                if qual > best_qual:
-                    best_qual = qual
-                    best_nuc = nuc
-            consensus += best_nuc
-        return consensus
-
-
-    def initialize_target_region_reads(self, target_region, expanded_start, expanded_end):
-        target_region_reads = defaultdict(lambda: defaultdict(int))
-        i = 0
-        for pos in range(expanded_start, expanded_end):
-            target_region_reads[pos][target_region[i]] += 1
-            i += 1
-        return target_region_reads
 
 
     def get_reference_direct_repeats(self, flank_pairs, genome_dict, target_region_size=50):

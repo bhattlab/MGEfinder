@@ -293,7 +293,7 @@ def wholegenome(reference, query, read_length, read_depth, min_alignment_quality
     if query_id is None:
         query_id = abspath(query)
 
-    log_params(command='recall', reference=reference, query=query,
+    log_params(command='wholegenome', reference=reference, query=query,
                read_length=read_length, read_depth=read_depth,
                min_alignment_quality=min_alignment_quality,
                max_direct_repeat_length=max_direct_repeat_length,
