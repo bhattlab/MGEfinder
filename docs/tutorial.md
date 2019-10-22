@@ -117,8 +117,7 @@ when you make your own working directories, you use this directory structure and
             └── <genome>.fna
 
 Be sure to keep the file naming consistent with what is shown above, including directory names and suffixes. 
-`<genome>` refers to the name of the genome to which the sample was aligned. Files in the directory can be symlinks to 
-the actual files. 
+`<genome>` refers to the name of the genome to which the sample was aligned. Make sure that the only periods in your file names are the ones shown above. Files in the directory can be symlinks to the actual files. 
 
 ## Analyzing the test dataset using *mgefinder workflow*
 
