@@ -166,7 +166,7 @@ the files that were generated are named:
             ├── 04.makefasta.efae_GCF_900639545.all_seqs.fna
             └── 04.makefasta.efae_GCF_900639545.repr_seqs.fna
 
-The file `01.clusterseq.efae_GCF_900639545.tsv`. This is effectively a complete list of all inferred sequences
+The file `01.clusterseq.efae_GCF_900639545.tsv` a complete list of all inferred sequences
 for all ten files. This file includes the `sample`, `pair_id` (refers to results of the `pair` output files),
 `method` (sequence inference method, such as `inferred_assembly_with_full_context`), `loc` (the location
 of where the sequence was found, either in the reference genome, assembly, or dynamically-constructed database),
