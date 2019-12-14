@@ -9,10 +9,10 @@ It can identify mobile genetic elements and their sites of insertion using an *a
 Follow the links below to learn more.
 
 ## Table of Contents
-1. [How it works](docs/howitworks.md)  
-2. [Install or update software](docs/install.md)  
-3. [Step-by-step tutorial](docs/tutorial.md)
-4. [Detailed user manual](docs/manual.md)
+1. [How it works](https://github.com/bhattlab/MGEfinder/wiki/How-it-works)
+2. [Install or update software](https://github.com/bhattlab/MGEfinder/wiki/Installation)
+3. [Step-by-step tutorial](https://github.com/bhattlab/MGEfinder/wiki/Tutorial)
+4. [Detailed user manual](https://github.com/bhattlab/MGEfinder/wiki/User-manual)
 
 
 ## Preprint
