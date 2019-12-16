@@ -1,4 +1,10 @@
-from snakemake import shell
+import sys
+try:
+    from snakemake import shell
+except ImportError:
+    print("MISSING DEPENDENCY: Snakemake is not installed. You can install with the command \"pip3 install snakemake\"")
+    sys.exit()
+
 
 
 def _workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going):
