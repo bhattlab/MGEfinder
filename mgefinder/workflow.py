@@ -1,8 +1,9 @@
 import sys
+from snakemake import shell
 try:
     from snakemake import shell
 except ImportError:
-    print("MISSING DEPENDENCY: Snakemake is not installed. You can install with the command \"pip3 install snakemake\"")
+    print("MISSING DEPENDENCY: Snakemake is not installed. You can install with the command \"conda install -c bioconda -c conda-forge snakemake\" or \"pip3 install snakemake\"")
     sys.exit()
 
 
