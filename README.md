@@ -15,9 +15,8 @@ Follow the links below to learn more.
 4. [Detailed user manual](https://github.com/bhattlab/MGEfinder/wiki/User-manual)
 
 
-## Preprint
-Durrant, Matthew, Michelle M. Li, Benjamin Siranosian, and Ami S. Bhatt. 2019. ["Mobile Genetic Element Insertions Drive 
-Antibiotic Resistance across Pathogens.](https://doi.org/10.1101/527788) *bioRxiv*.
+## Publication
+Durrant, M. G., Li, M. M., Siranosian, B. A., Montgomery, S. B. & Bhatt, A. S. [A Bioinformatic Analysis of Integrative Mobile Genetic Elements Highlights Their Role in Bacterial Adaptation](https://www.cell.com/cell-host-microbe/fulltext/S1931-3128(19)30546-3). *Cell Host & Microbe* 0, (2019)
 
 ## Questions / Comments
 Please submit any questions or comments to our [issues handler](https://github.com/durrantmm/mgefinder/issues). 
