@@ -1,3 +1,3 @@
-cp ../env/conda_linux64.yaml .
+cp ../env/conda_linux64.yaml environment.yml
 docker build -t mgefinder .
-rm conda_linux64.yaml
+rm environment.yml

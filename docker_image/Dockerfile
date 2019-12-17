@@ -1,7 +1,7 @@
-FROM continuumio/miniconda3
+FROM continuumio/miniconda3:4.6.14
 
-COPY conda_linux64.yaml /tmp/conda_linux64.yaml
-RUN conda update -n base -c defaults conda
-RUN conda env create -f tmp/conda_linux64.yaml 
-RUN echo "source activate mgefinder" >> ~/.bashrc
-ENV PATH /opt/conda/envs/env/bin:$PATH
+RUN conda install -c bioconda python=3.6 htslib pysam snakemake emboss bowtie2 samtools cd-hit
+
+RUN pip install mgefinder
+
+WORKDIR /data/
