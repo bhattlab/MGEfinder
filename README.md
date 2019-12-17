@@ -10,7 +10,7 @@ Follow the links below to learn more.
 
 ## Table of Contents
 1. [How it works](https://github.com/bhattlab/MGEfinder/wiki/How-it-works)
-2. [Install or update software](https://github.com/bhattlab/MGEfinder/wiki/Installation)
+2. [Install *MGEfinder*](https://github.com/bhattlab/MGEfinder/wiki/Installation)
 3. [Step-by-step tutorial](https://github.com/bhattlab/MGEfinder/wiki/Tutorial)
 4. [Detailed user manual](https://github.com/bhattlab/MGEfinder/wiki/User-manual)
 
