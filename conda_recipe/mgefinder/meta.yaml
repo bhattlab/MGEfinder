@@ -1,5 +1,5 @@
 {% set name = "mgefinder" %}
-{% set version = "0.0.1.dev7" %}
+{% set version = "1.0.0" %}
 
 package:
   name: "{{ name|lower }}"
@@ -7,14 +7,13 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: "756cc195a03cfc17a0d550a000ad618957239b11f60de6813705772911ee2847"
+  sha256: "074af498e2663d2fd2ab69ea2e9e002cb20b91723a9360f9805e742a80234433"
 
 build:
   number: 0
   entry_points:
     - mgefinder = mgefinder.main:cli
   script: "{{ PYTHON }} -m pip install . --no-deps --ignore-installed -vv"
-
 requirements:
   host:
     - biopython
