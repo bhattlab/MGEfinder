@@ -6,7 +6,7 @@ conda env remove -n mgefinder --yes
 echo "Installing mgefinder environment..."
 system=$(uname)
 
-if [ system -eq "Darwin" ]; then
+if [ ${system}=="Darwin" ]; then
 	conda env create -f env/conda_osx64.yaml
 else
 	conda env create -f env/conda_linux64.yaml
