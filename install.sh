@@ -4,7 +4,13 @@ echo "Removing mgefinder environment if already installed..."
 conda env remove -n mgefinder --yes
 
 echo "Installing mgefinder environment..."
-conda env create -f conda.yaml
+system=$(uname)
+
+if [ system -eq "Darwin" ]; then
+	conda env create -f env/conda_osx64.yaml
+else
+	conda env create -f env/conda_linux64.yaml
+fi
 
 echo "Installation Complete."
 echo ""
