@@ -8,6 +8,7 @@ dependencies:
   - bcrypt=3.1.7=py36h7b6447c_0
   - blas=1.0=mkl
   - bowtie2=2.3.5=py36he860b03_0
+  - bwa=0.7.17=hed695b0_7
   - bzip2=1.0.8=h7b6447c_0
   - ca-certificates=2019.11.27=0
   - cd-hit=4.8.1=hdbcaa40_0
