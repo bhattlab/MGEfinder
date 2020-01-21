@@ -1,3 +1,5 @@
+![mustache image](https://github.com/bhattlab/MGEfinder/blob/master/docs/img/mustache.png)
+
 # *MGEfinder* - A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates.
 
 The command-line tool *MGEfinder* identifies large insertions and genotypes them with respect to a reference genome.
