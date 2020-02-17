@@ -146,7 +146,7 @@ class FlankPairer:
             if row.orient != '5p':
                 continue
 
-            contig, pos_5p = row['contig'], row['pos']
+            contig, pos_5p = str(row['contig']), row['pos']
             softclip_count_5p, total_count_5p, seq_5p = row['consensus_softclip_count'], row['total_count'], row['consensus_seq']
 
             min_pos = pos_5p - self.max_direct_repeat_length - 1
@@ -286,7 +286,7 @@ class FlankPairer:
 
         direct_repeats = []
         for index, row in positions.iterrows():
-            contig, start, end = row['contig'], row['pos_3p'], row['pos_5p']
+            contig, start, end = str(row['contig']), row['pos_3p'], row['pos_5p']
 
             direct_repeat = genome_dict[contig][(start+1):end]
             direct_repeats.append(''.join(direct_repeat))
@@ -301,7 +301,7 @@ class FlankPairer:
         contig_lengths = pysamtools.get_bam_contig_dict(self.bam)
         for index, row in assigned_pairs.iterrows():
             spanning_read_names = set()
-            contig, pos_3p, pos_5p = row['contig'], row['pos_3p'], row['pos_5p']
+            contig, pos_3p, pos_5p = str(row['contig']), row['pos_3p'], row['pos_5p']
             reads = self.get_reads_at_site(contig, pos_3p, pos_5p, self.bam, contig_lengths)
 
             for read in reads:

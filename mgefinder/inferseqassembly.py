@@ -90,7 +90,7 @@ class InferSequenceContext(InferSequence):
 
         context_termini = []
         for index, p in self.pairs.iterrows():
-            pair_id, contig_name, pos_5p, pos_3p, seq_5p, seq_3p = p['pair_id'], p['contig'], p['pos_5p'], p['pos_3p'], \
+            pair_id, contig_name, pos_5p, pos_3p, seq_5p, seq_3p = p['pair_id'], str(p['contig']), p['pos_5p'], p['pos_3p'], \
                                                                    p['seq_5p'], p['seq_3p']
             seq_5p, seq_3p = seq_5p.rstrip('N'), seq_3p.lstrip('N')
             context_5p = self.get_sequence_context(self.ref_genome_dict[contig_name], contig_name,
