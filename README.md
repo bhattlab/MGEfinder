@@ -16,7 +16,7 @@ Follow the links below to learn more.
 3. [Step-by-step tutorial](https://github.com/bhattlab/MGEfinder/wiki/Tutorial)
 4. [Detailed user manual](https://github.com/bhattlab/MGEfinder/wiki/User-manual)
 
-## Special note on site-specific itegrative mobile elements
+## Special note on site-specific integrative mobile elements
 While *MGEfinder* can detect a wide variety of site-specific integrative mobile elements, it is best suited for transposable elements. For example, certain types of tRNA-targeting mobile elements will be missed by *MGEfinder* by default because of their unique integration mechanism, whereby they replace the target sequence with a new sequence to repair the tRNA. But *MGEfinder* can still find these integrative elements if you adjust the parameters properly. If you would like advice on how to do this, please open an [issue](https://github.com/bhattlab/MGEfinder/issues) with your request.
 
 ## Publication
