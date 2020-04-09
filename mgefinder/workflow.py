@@ -17,9 +17,9 @@ def _workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incom
     cmd = 'snakemake -s {snakefile} --config wd={workdir} memory={memory} ' \
           '--cores {cores} --configfile {configfile}'
     if rerun_incomplete:
-        cmd += '--rerun-incomplete '
+        cmd += ' --rerun-incomplete '
     if keep_going:
-        cmd += '--keep-going'
+        cmd += ' --keep-going'
     
     cmd = cmd.format(snakefile=snakefile, configfile=configfile, workdir=workdir, memory=memory, cores=cores)
     print('COMMAND:', cmd)
