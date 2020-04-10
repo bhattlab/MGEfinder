@@ -18,6 +18,7 @@ from mgefinder.summarize import _summarize
 from mgefinder.makefasta import _makefasta
 from mgefinder.wholegenome import _wholegenome
 from mgefinder.dependencies import check_dependencies
+from mgefinder.misc import aligned_bwa, BWACheckError
 
 import click
 from os.path import join, dirname, abspath
@@ -73,21 +74,28 @@ def getworkflow():
 @click.option('--large_insertion_cutoff', '-lins', default=30, help="Keep large insertions if they meet this length. default=30")
 @click.option('--min_count_consensus', '-mcc', default=2, help="When building the consensus sequence, stop building consensus if read count drops below this cutoff. default=2")
 @click.option('--sample_id', '-id', default=None, help="Specify an ID to use for this sample, default is the absolute path to the bam file")
+@click.option('--check-bwa/--no-check-bwa', default=True, help="Check to ensure that BWA MEM was used to generate BAM file. default=True")
 @click.option('--output_file', '-o', default='mgefinder.find.tsv', help="The output file to save the results. default=mgefinder.find.tsv")
 def find(bamfile, min_softclip_length, min_softclip_count, min_alignment_quality, min_alignment_inner_length,
                min_distance_to_mate, min_softclip_ratio, max_indel_ratio, large_insertion_cutoff,
-               min_count_consensus, sample_id, output_file):
+               min_count_consensus, sample_id, check_bwa, output_file):
     """A click access point for the find module. This is used for creating the command line interface."""
 
     if sample_id is None:
         sample_id = abspath(bamfile)
+
+    if check_bwa and not aligned_bwa(bamfile):
+        raise BWACheckError("ERROR: Please use BWA MEM to align your reads to the reference genome. Other aligners may not be compatible. To disable this check, use the --no-check-bwa flag.")
+        sys.exit()
+    
 
     log_params(command='find',
                  bamfile=bamfile, min_softclip_length=min_softclip_length, min_softclip_count=min_softclip_count,
                  min_alignment_quality=min_alignment_quality, min_alignment_inner_length=min_alignment_inner_length,
                  min_distance_to_mate=min_distance_to_mate, min_softclip_ratio=min_softclip_ratio,
                  max_indel_ratio=max_indel_ratio, large_insertion_cutoff=large_insertion_cutoff,
-                 min_count_consensus=min_count_consensus, sample_id=sample_id, output_file=output_file)
+                 min_count_consensus=min_count_consensus, sample_id=sample_id, check_bwa=check_bwa, 
+                 output_file=output_file)
     _find(bamfile, min_softclip_length, min_softclip_count, min_alignment_quality, min_alignment_inner_length,
                 min_distance_to_mate, min_softclip_ratio, max_indel_ratio, large_insertion_cutoff,
                 min_count_consensus, sample_id, output_file)

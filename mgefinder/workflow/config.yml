@@ -19,6 +19,7 @@ find:
   maxir: 0.03
   lins: 30
   mcc: 2
+  check_bwa_flag: "--check-bwa"
 
 pair:
   maxdr: 20

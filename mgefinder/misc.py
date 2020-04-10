@@ -1,4 +1,5 @@
 import warnings
+import pysam
 warnings.filterwarnings("ignore")
 
 from scipy.stats import poisson
@@ -114,3 +115,16 @@ if __name__ == "__main__":
     print(takeClosestLarger([1, 2, 3], 3), 3)
     print(takeClosestLarger([1, 2, 3], 4), 4)
     print(takeClosestLarger([1, 2, 3], 5), 5)
+
+def aligned_bwa(bampath):
+    bam = pysam.AlignmentFile(bampath)
+    header = str(bam.header)
+    try:
+        header.index('ID:bwa')
+        return True
+    except ValueError:
+        return False
+
+def BWACheckError(Exception):
+    pass
+

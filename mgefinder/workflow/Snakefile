@@ -39,9 +39,9 @@ rule index_genome_bowtie2:
         revtwo=join(GENOME_DIR, "{genome}.fna.rev.2.bt2")
     shell:
         """
-        bowtie2-build {input} {input} &> {log}
+        bowtie2-build {input} {input} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
-
 
 rule index_assembly:
     log: join(ASSEMBLY_DIR, "log/{sample}.index_assembly.log")
@@ -57,7 +57,8 @@ rule index_assembly:
         revtwo=join(ASSEMBLY_DIR, "{sample}.fna.rev.2.bt2")
     shell:
         """
-        bowtie2-build {input} {input} &> {log}
+        bowtie2-build {input} {input} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
 
 
@@ -78,12 +79,14 @@ rule find:
         minratio=config['find']['minratio'],
         maxir=config['find']['maxir'],
         lins=config['find']['lins'],
-        mcc=config['find']['mcc']
+        mcc=config['find']['mcc'],
+        check_bwa=config['find']['check_bwa_flag']
     shell:
         """
         mgefinder find -id {params.sample} -minlen {params.minlen} -mincount {params.mincount} -minq {params.minq} \
         -minial {params.minial} -mindist {params.mindist} -minratio {params.minratio} -maxir {params.maxir} -lins \
-        {params.lins} -mcc {params.mcc} {input.bam} -o {output.find} &> {log}
+        {params.lins} -mcc {params.mcc} {params.check_bwa} {input.bam} -o {output.find} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
 
 
@@ -105,7 +108,8 @@ rule pair:
     shell:
         """
         mgefinder pair -maxdr {params.maxdr} -minq {params.minq} -minial {params.minial} -maxjsp {params.maxjsp} \
-        -lins {params.lins} {input.find} {input.bam} {input.genome} -o {output.pair} &> {log}
+        -lins {params.lins} {input.find} {input.bam} {input.genome} -o {output.pair} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
 
 
@@ -129,7 +133,8 @@ rule inferseq_assembly:
     shell:
         """
         mgefinder inferseq-assembly -minident {params.minident} -maxclip {params.maxclip} -maxsize {params.maxsize} \
-        -minsize {params.minsize} {input.pair} {input.bam} {input.recover_assembly} {input.recover_reference} -o {output.recover} &> {log}
+        -minsize {params.minsize} {input.pair} {input.bam} {input.recover_assembly} {input.recover_reference} -o {output.recover} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
 
 
@@ -150,7 +155,8 @@ rule inferseq_reference:
     shell:
         """
         mgefinder inferseq-reference -minident {params.minident} -maxclip {params.maxclip} -maxsize {params.maxsize} \
-        -minsize {params.minsize} {input.pair} {input.recover_reference} -o {output.recover} &> {log}
+        -minsize {params.minsize} {input.pair} {input.recover_reference} -o {output.recover} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
 
 
@@ -168,7 +174,7 @@ rule inferseq_overlap:
     shell:
         """
         mgefinder inferseq-overlap -minscore {params.minscore} -minopi {params.minopi} -minsize {params.minsize} \
-        {input.pair} -o {output.outfile} &> {log}
+        {input.pair} -o {output.outfile} 1> {log} 2> {log}.err
         """
 
 rule make_inferseq_file_path_list:
@@ -221,7 +227,7 @@ rule inferseq_database:
     shell:
         """
         mgefinder inferseq-database -minident {params.minident} -maxclip {params.maxclip} -maxedgedist \
-        {params.maxedgedist} {input.pair} {input.database} -o {output.outfile} &> {log}
+        {params.maxedgedist} {input.pair} {input.database} -o {output.outfile} 1> {log} 2> {log}.err
         """
 
 rule make_inferseq_database_file_path_list:
@@ -279,9 +285,11 @@ rule genotype:
     shell:
         """
         if [ "{params.filter_clusters}" == "True" ]; then
-            mgefinder genotype --filter-clusters-inferred-assembly {input} -o {output} &> {log}
+            mgefinder genotype --filter-clusters-inferred-assembly {input} -o {output} 1> {log} 2> {log}.err || \
+            (cat {log}.err; exit 1)
         else
-            mgefinder genotype --no-filter-clusters-inferred-assembly {input} -o {output} &> {log}
+            mgefinder genotype --no-filter-clusters-inferred-assembly {input} -o {output} 1> {log} 2> {log}.err || \
+            (cat {log}.err; exit 1)
         fi
         """
 
@@ -298,7 +306,8 @@ rule summarize:
         prefix=join(RESULTS_DIR, '{genome}/03.summarize.{genome}')
     shell:
         """
-        mgefinder summarize {input} -o {params.prefix} &> {log}
+        mgefinder summarize {input} -o {params.prefix} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
 
 
@@ -315,5 +324,6 @@ rule makefasta:
         prefix=join(RESULTS_DIR, '{genome}/04.makefasta.{genome}')
     shell:
         """
-        mgefinder makefasta {input} -o {params.prefix} &> {log}
+        mgefinder makefasta {input} -o {params.prefix} 1> {log} 2> {log}.err || \
+        (cat {log}.err; exit 1)
         """
