@@ -84,7 +84,6 @@ def find(bamfile, min_softclip_length, min_softclip_count, min_alignment_quality
     if sample_id is None:
         sample_id = abspath(bamfile)
 
-    print(aligned_bwa(bamfile))
     if check_bwa and not aligned_bwa(bamfile):
         raise BWACheckError("ERROR: Please use BWA MEM to align your reads to the reference genome. Other aligners may not be compatible. To disable this check, use the --no-check-bwa flag.")
         sys.exit()
