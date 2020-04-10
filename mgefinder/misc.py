@@ -121,9 +121,14 @@ def aligned_bwa(bampath):
     header = str(bam.header)
     try:
         header.index('ID:bwa')
+        
         return True
     except ValueError:
-        return False
+        try:
+            header.index("'ID': 'bwa'")
+            return True
+        except ValueError:
+            return False
 
 def BWACheckError(Exception):
     pass
