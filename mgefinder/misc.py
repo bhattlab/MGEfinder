@@ -117,12 +117,18 @@ if __name__ == "__main__":
     print(takeClosestLarger([1, 2, 3], 5), 5)
 
 def aligned_bwa(bampath):
+    print(bampath)
     bam = pysam.AlignmentFile(bampath)
+    print(bam)
     header = str(bam.header)
+    print(bam.header)
+    print(type(bam.header))
     try:
         header.index('ID:bwa')
+        
         return True
     except ValueError:
+        print('FAILED CHECK')
         return False
 
 def BWACheckError(Exception):
