@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name="mgefinder",
-    version='1.0.4',
+    version='1.0.5',
     description='A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -16,14 +16,14 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'click',
-        'pandas',
-        'biopython',
-        'pysam',
+        'click=7.0',
+        'pandas=0.25.3',
+        'biopython=1.75',
+        'pysam=0.15.3',
         'editdistance',
-        'scipy',
-        'networkx',
-        'tqdm'
+        'scipy=1.4.0',
+        'networkx=2.4',
+        'tqdm=4.40.2'
     ],
     zip_safe=False,
     entry_points = {
