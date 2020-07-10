@@ -200,6 +200,7 @@ class FlankPairer:
                     if len(ir1.seq) > ir_length:
                         keep_ir1 = ir1.seq
                         keep_ir2 = ir2.seq
+                        ir_length = len(keep_ir1)
 
             shell('rm -f %s' % tmp_fasta_path)
             shell('rm -f %s' % tmp_einverted_outfile)
