@@ -25,4 +25,4 @@ Durrant, M. G., Li, M. M., Siranosian, B. A., Montgomery, S. B. & Bhatt, A. S. [
 Please also consider viewing my [video presentation](https://jrnlclub.org/research-films/mgefinder) of this paper, provided through [JRNLclub](https://jrnlclub.org/research-films/mgefinder).
 
 ## Questions / Comments
-Please submit any questions or comments to our [issues handler](https://github.com/durrantmm/mgefinder/issues). 
+Please submit any questions or comments to our [issues handler](https://github.com/bhattlab/MGEfinder/issues). 
