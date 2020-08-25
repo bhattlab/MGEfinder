@@ -16,14 +16,14 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'click=7.0',
-        'pandas=0.25.3',
-        'biopython=1.75',
-        'pysam=0.15.3',
+        'click==7.0',
+        'pandas==0.25.3',
+        'biopython==1.75',
+        'pysam==0.15.3',
         'editdistance',
-        'scipy=1.4.0',
-        'networkx=2.4',
-        'tqdm=4.40.2'
+        'scipy==1.4.0',
+        'networkx==2.4',
+        'tqdm==4.40.2'
     ],
     zip_safe=False,
     entry_points = {

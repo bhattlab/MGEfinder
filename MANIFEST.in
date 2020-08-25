@@ -1,2 +1,8 @@
-include mgefinder/workflow/Snakefile
-include mgefinder/workflow/config.yml
+include mgefinder/workflow/database.original.config.yml
+include mgefinder/workflow/database.original.Snakefile
+include mgefinder/workflow/database.sensitive.config.yml
+include mgefinder/workflow/database.sensitive.Snakefile
+include mgefinder/workflow/denovo.original.config.yml
+include mgefinder/workflow/denovo.original.Snakefile
+include mgefinder/workflow/denovo.sensitive.config.yml
+include mgefinder/workflow/denovo.sensitive.Snakefile
