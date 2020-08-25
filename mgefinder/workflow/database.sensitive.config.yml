@@ -1,0 +1,44 @@
+wd: NONE
+
+genome_dir: 00.genome
+bam_dir: 00.bam
+database_dir: 00.database
+mgefinder_dir: 01.mgefinder
+results_dir: 02.results
+
+memory: 16000
+
+find:
+  minlen: 8
+  mincount: 2
+  minq: 20
+  minial: 51
+  mindist: 52
+  minratio: 0.10
+  maxir: 0.03
+  lins: 30
+  mcc: 2
+  check_bwa_flag: "--check-bwa"
+
+pair:
+  maxdr: 50
+  minq: 20
+  minial: 51
+  maxjsp: 0.15
+  lins: 30
+
+makedatabase:
+  minsize: 30
+  maxsize: 200000
+
+inferseq_database:
+  minident: 0.90
+  maxclip: 0.05
+  maxedgedist: 10
+
+clusterseq:
+  minsize: 70
+  maxsize: 200000
+
+genotype:
+  filter_clusters: False

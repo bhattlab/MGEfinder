@@ -21,11 +21,18 @@ from mgefinder.dependencies import check_dependencies
 from mgefinder.misc import aligned_bwa, BWACheckError
 
 import click
-from os.path import join, dirname, abspath
+from os.path import join, dirname, abspath, basename
 from shutil import copyfile
 
-WORKFLOW_SNAKEFILE = join(dirname(__file__), 'workflow/Snakefile')
-WORKFLOW_CONFIG = join(dirname(__file__), 'workflow/config.yml')
+WORKFLOW_DENOVO_ORIGINAL_SNAKEFILE = join(dirname(__file__), 'workflow/denovo.original.Snakefile')
+WORKFLOW_DENOVO_ORIGINAL_CONFIG = join(dirname(__file__), 'workflow/denovo.original.config.yml')
+WORKFLOW_DENOVO_SENSITIVE_SNAKEFILE = join(dirname(__file__), 'workflow/denovo.sensitive.Snakefile')
+WORKFLOW_DENOVO_SENSITIVE_CONFIG = join(dirname(__file__), 'workflow/denovo.sensitive.config.yml')
+
+WORKFLOW_DATABASE_ORIGINAL_SNAKEFILE = join(dirname(__file__), 'workflow/database.original.Snakefile')
+WORKFLOW_DATABASE_ORIGINAL_CONFIG = join(dirname(__file__), 'workflow/database.original.config.yml')
+WORKFLOW_DATABASE_SENSITIVE_SNAKEFILE = join(dirname(__file__), 'workflow/database.sensitive.Snakefile')
+WORKFLOW_DATABASE_SENSITIVE_CONFIG = join(dirname(__file__), 'workflow/database.sensitive.config.yml')
 
 check_dependencies()
 
@@ -34,30 +41,84 @@ def cli():
     """Command-line tools to identify mobile genetic element insertions from short-read sequencing data."""
     pass
 
-@cli.command(short_help='Run mgefinder on a working directory using a snakemake workflow.', help_priority=1)
+@cli.group(cls=CustomHelp)
+def workflow():
+    """Choose a workflow for running mgefinder"""
+    pass
+
+@workflow.command(short_help='Run mgefinder on a working directory using the de novo workflow.', help_priority=1)
 @click.argument('workdir', type=click.Path(exists=True))
-@click.option('--snakefile', '-s', default=WORKFLOW_SNAKEFILE, help="The Snakefile file to use when running the snakemake workflow. Default is provided with mgefinder installation.")
-@click.option('--configfile', '-c', default=WORKFLOW_CONFIG, help="The config file to use when running the snakemake workflow. Default is provided with mgefinder installation.")
 @click.option('--cores', '-t', default=1, help="The number of processors to run while finding flank extensions. default=1")
 @click.option('--memory', '-m', default=16000, help="Memory limit in megabytes. default=16000; 0 for unlimited")
 @click.option('--unlock/--no-unlock',  default=False, help="Unlock working directory if necessary.")
 @click.option('--rerun-incomplete/--no-rerun-incomplete',  default=False, help="Rerun incomplete files in the workflow.")
 @click.option('--keep-going/--no-keep-going',  default=False, help="Keep going with independent jobs if one fails.")
-def workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going):
+@click.option('--sensitive/--original',  default=False, help="Run in original mode (default) or sensitive mode.")
+def denovo(workdir, cores, memory, unlock, rerun_incomplete, keep_going, sensitive):
     """A click access point for the workflow module. This is used for creating the command line interface."""
 
-    log_params(command='workflow', workdir=workdir, snakefile=snakefile, configfile=configfile, cores=cores, memory=memory,
-                 unlock=unlock, rerun_incomplete=rerun_incomplete, keep_going=keep_going)
+    snakefile = WORKFLOW_DENOVO_ORIGINAL_SNAKEFILE
+    configfile = WORKFLOW_DENOVO_ORIGINAL_CONFIG
+    if sensitive:
+        snakefile = WORKFLOW_DENOVO_SENSITIVE_SNAKEFILE
+        configfile = WORKFLOW_DENOVO_SENSITIVE_CONFIG
+
+    log_params(command='workflow', workdir=workdir, cores=cores, memory=memory,
+                 unlock=unlock, rerun_incomplete=rerun_incomplete, keep_going=keep_going, sensitive=sensitive)
+    _workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going)
+
+@workflow.command(short_help='Run mgefinder on a working directory using the database workflow.', help_priority=2)
+@click.argument('workdir', type=click.Path(exists=True))
+@click.option('--cores', '-t', default=1, help="The number of processors to run while finding flank extensions. default=1")
+@click.option('--memory', '-m', default=16000, help="Memory limit in megabytes. default=16000; 0 for unlimited")
+@click.option('--unlock/--no-unlock',  default=False, help="Unlock working directory if necessary.")
+@click.option('--rerun-incomplete/--no-rerun-incomplete',  default=False, help="Rerun incomplete files in the workflow.")
+@click.option('--keep-going/--no-keep-going',  default=False, help="Keep going with independent jobs if one fails.")
+@click.option('--sensitive/--original',  default=False, help="Run in original mode (default) or sensitive mode.")
+def database(workdir, cores, memory, unlock, rerun_incomplete, keep_going, sensitive):
+    """A click access point for the workflow module. This is used for creating the command line interface."""
+
+    snakefile = WORKFLOW_DATABASE_ORIGINAL_SNAKEFILE
+    configfile = WORKFLOW_DATABASE_ORIGINAL_CONFIG
+    if sensitive:
+        snakefile = WORKFLOW_DATABASE_SENSITIVE_SNAKEFILE
+        configfile = WORKFLOW_DATABASE_SENSITIVE_CONFIG
+
+    log_params(command='workflow', workdir=workdir, cores=cores, memory=memory,
+                 unlock=unlock, rerun_incomplete=rerun_incomplete, keep_going=keep_going, sensitive=sensitive)
+    _workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going)
+
+@workflow.command(short_help='Run mgefinder on a working directory using a custom workflow.', help_priority=3)
+@click.argument('workdir', type=click.Path(exists=True))
+@click.option('--snakefile', '-s', type=click.Path(exists=True), required=True)
+@click.option('--configfile', '-s', type=click.Path(exists=True), required=True)
+@click.option('--cores', '-t', default=1, help="The number of processors to run while finding flank extensions. default=1")
+@click.option('--memory', '-m', default=16000, help="Memory limit in megabytes. default=16000; 0 for unlimited")
+@click.option('--unlock/--no-unlock',  default=False, help="Unlock working directory if necessary.")
+@click.option('--rerun-incomplete/--no-rerun-incomplete',  default=False, help="Rerun incomplete files in the workflow.")
+@click.option('--keep-going/--no-keep-going',  default=False, help="Keep going with independent jobs if one fails.")
+def custom(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going):
+    """A click access point for the workflow module. This is used for creating the command line interface."""
+
+    log_params(command='workflow', snakefile=snakefile, configfile=configfile, workdir=workdir, cores=cores, memory=memory,
+                 unlock=unlock, rerun_incomplete=rerun_incomplete, keep_going=keep_going, sensitive=sensitive)
     _workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going)
 
 
-@cli.command(short_help='Get copies of the default Snakefile and config files.', help_priority=2)
+@cli.command(short_help='Get copies of all of the default Snakefile and config files.', help_priority=2)
 def getworkflow():
     """A click access point for the getworkflow module. This is used for creating the command line interface."""
 
     click.echo("Copying Snakefile and config file to current working directory...")
-    copyfile(WORKFLOW_SNAKEFILE, "Snakefile")
-    copyfile(WORKFLOW_CONFIG, "config.yml")
+    copyfile(WORKFLOW_DENOVO_ORIGINAL_SNAKEFILE, basename(WORKFLOW_DENOVO_ORIGINAL_SNAKEFILE))
+    copyfile(WORKFLOW_DENOVO_ORIGINAL_CONFIG, basename(WORKFLOW_DENOVO_ORIGINAL_CONFIG))
+    copyfile(WORKFLOW_DENOVO_SENSITIVE_SNAKEFILE, basename(WORKFLOW_DENOVO_SENSITIVE_SNAKEFILE))
+    copyfile(WORKFLOW_DENOVO_SENSITIVE_CONFIG, basename(WORKFLOW_DENOVO_SENSITIVE_CONFIG))
+
+    copyfile(WORKFLOW_DATABASE_ORIGINAL_SNAKEFILE, basename(WORKFLOW_DATABASE_ORIGINAL_SNAKEFILE))
+    copyfile(WORKFLOW_DATABASE_ORIGINAL_CONFIG, basename(WORKFLOW_DATABASE_ORIGINAL_CONFIG))
+    copyfile(WORKFLOW_DATABASE_SENSITIVE_SNAKEFILE, basename(WORKFLOW_DATABASE_SENSITIVE_SNAKEFILE))
+    copyfile(WORKFLOW_DATABASE_SENSITIVE_CONFIG, basename(WORKFLOW_DATABASE_SENSITIVE_CONFIG))
     click.echo("Done.")
 
 
