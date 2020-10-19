@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name="mgefinder",
-    version='1.0.5',
+    version='1.0.6',
     description='A toolbox for identifying mobile genetic element (MGE) insertions from short-read sequencing data of bacterial isolates.',
     long_description=long_description,
     long_description_content_type="text/markdown",

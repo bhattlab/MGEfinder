@@ -1,6 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 import sys
+from mgefinder import __version__
 from mgefinder.workflow import _workflow
 from mgefinder.find import _find
 from mgefinder.pair import _pair
@@ -36,9 +37,18 @@ WORKFLOW_DATABASE_SENSITIVE_CONFIG = join(dirname(__file__), 'workflow/database.
 
 check_dependencies()
 
-@click.group(cls=CustomHelp)
+def print_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    click.echo('MGEfinder version: ' + __version__)
+    ctx.exit()
+
+@click.group(cls=CustomHelp, invoke_without_command=True)
+@click.option('--version', is_flag=True, callback=print_version, expose_value=False, is_eager=True, help="Get MGEfinder version.")
 def cli():
     """Command-line tools to identify mobile genetic element insertions from short-read sequencing data."""
+    click.echo("Get help documentation with --help.")
+    click.echo("Get version with --version.")
     pass
 
 @cli.group(cls=CustomHelp)
