@@ -101,7 +101,7 @@ def custom(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomple
     """A click access point for the workflow module. This is used for creating the command line interface."""
 
     log_params(command='workflow', snakefile=snakefile, configfile=configfile, workdir=workdir, cores=cores, memory=memory,
-                 unlock=unlock, rerun_incomplete=rerun_incomplete, keep_going=keep_going, sensitive=sensitive)
+                 unlock=unlock, rerun_incomplete=rerun_incomplete, keep_going=keep_going)
     _workflow(workdir, snakefile, configfile, cores, memory, unlock, rerun_incomplete, keep_going)
 
 
