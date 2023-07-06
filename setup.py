@@ -21,7 +21,7 @@ setup(
         'biopython==1.75',
         'pysam==0.15.3',
         'editdistance',
-        'scipy==1.4.0',
+        'scipy==1.10.0',
         'networkx==2.4',
         'tqdm==4.40.2'
     ],
