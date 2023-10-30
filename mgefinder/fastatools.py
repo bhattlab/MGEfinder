@@ -3,7 +3,10 @@ warnings.filterwarnings("ignore")
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
-from Bio.Alphabet import IUPAC
+try:
+    from Bio.Alphabet import IUPAC
+except ImportError:
+        IUPAC = None
 from mgefinder.misc import revcomp
 
 
@@ -14,8 +17,13 @@ def write_sequences_to_fasta(sequences, fasta, names=None):
             name = names[i]
         else:
             name = i
-        record = SeqRecord(Seq(sequences[i], IUPAC.IUPACAmbiguousDNA),
+
+        if IUPAC:
+            record = SeqRecord(Seq(sequences[i], IUPAC.IUPACAmbiguousDNA),
                            id=str(name), description=str(name))
+        else:
+            record = SeqRecord(Seq(sequences[i]), annotations={"molecule_type": "DNA"},
+                                               id=str(name), description=str(name))
         outseqs.append(record)
     with open(fasta, 'w') as output_handle:
         SeqIO.write(outseqs, output_handle, 'fasta')
@@ -33,9 +41,15 @@ def write_termini_to_fasta(termini, fasta):
         seq5p = row['seq_5p']
         seq3p = row['seq_3p']
 
-        record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
+        if IUPAC:
+            record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
                            id=str(name5p), description=str(name5p))
-        record3p = SeqRecord(Seq(seq3p, IUPAC.IUPACAmbiguousDNA),
+            record3p = SeqRecord(Seq(seq3p, IUPAC.IUPACAmbiguousDNA),
+                             id=str(name3p), description=str(name3p))
+        else:
+            record5p = SeqRecord(Seq(seq5p), annotations={"molecule_type": "DNA"},
+                           id=str(name5p), description=str(name5p))
+            record3p = SeqRecord(Seq(seq3p), annotations={"molecule_type": "DNA"},
                              id=str(name3p), description=str(name3p))
 
         outseqs.append(record5p)
@@ -54,9 +68,15 @@ def write_termini_to_paired_fasta(pairs, fasta_prefix):
         seq5p = p['seq_5p']
         seq3p = p['seq_3p']
 
-        record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
+        if IUPAC:
+            record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
                            id=str(name5p), description=str(name5p)+'_5p')
-        record3p = SeqRecord(Seq(revcomp(seq3p), IUPAC.IUPACAmbiguousDNA),
+            record3p = SeqRecord(Seq(revcomp(seq3p), IUPAC.IUPACAmbiguousDNA),
+                             id=str(name3p), description=str(name3p)+'_3p')
+        else:
+            record5p = SeqRecord(Seq(seq5p), annotations={"molecule_type": "DNA"},
+                           id=str(name5p), description=str(name5p)+'_5p')
+            record3p = SeqRecord(Seq(revcomp(seq3p)), annotations={"molecule_type": "DNA"},
                              id=str(name3p), description=str(name3p)+'_3p')
 
         fiveprime_outseqs.append(record5p)
@@ -78,9 +98,15 @@ def write_termini_to_unpaired_fasta(pairs, fasta_prefix):
         seq5p = p['seq_5p']
         seq3p = p['seq_3p']
 
-        record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
+        if IUPAC:
+            record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
                            id=str(name5p), description=str(name5p)+'_5p')
-        record3p = SeqRecord(Seq(revcomp(seq3p), IUPAC.IUPACAmbiguousDNA),
+            record3p = SeqRecord(Seq(revcomp(seq3p), IUPAC.IUPACAmbiguousDNA),
+                             id=str(name3p), description=str(name3p)+'_3p')
+        else:
+            record5p = SeqRecord(Seq(seq5p), annotations={"molecule_type": "DNA"},
+                           id=str(name5p), description=str(name5p)+'_5p')
+            record3p = SeqRecord(Seq(revcomp(seq3p)), annotations={"molecule_type": "DNA"},
                              id=str(name3p), description=str(name3p)+'_3p')
 
         fiveprime_outseqs.append(record5p)
@@ -101,9 +127,15 @@ def write_panisa_termini_to_fasta(termini, fasta):
         seq5p = row['Left sequence']
         seq3p = row['Right sequence']
 
-        record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
+        if IUPAC:
+            record5p = SeqRecord(Seq(seq5p, IUPAC.IUPACAmbiguousDNA),
                            id=str(name5p), description=str(name5p))
-        record3p = SeqRecord(Seq(seq3p, IUPAC.IUPACAmbiguousDNA),
+            record3p = SeqRecord(Seq(seq3p, IUPAC.IUPACAmbiguousDNA),
+                             id=str(name3p), description=str(name3p))
+        else:
+            record5p = SeqRecord(Seq(seq5p), annotations={"molecule_type": "DNA"},
+                           id=str(name5p), description=str(name5p))
+            record3p = SeqRecord(Seq(seq3p), annotations={"molecule_type": "DNA"},
                              id=str(name3p), description=str(name3p))
 
         outseqs.append(record5p)
